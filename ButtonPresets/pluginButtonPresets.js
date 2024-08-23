@@ -638,7 +638,7 @@ function executeInfoCode() {
             <strong>Stored presets are saved only on the current browser.</strong><br>
             `, 'Close');
         } else {
-            alert(`\t\t\t\t\t PRESET BUTTONS \t\t\t\t\n\nThis feature allows you to store up to 30 presets, with 10 presets per bank. To store a frequency:\n\nLeft-click to recall the preset.\n\nRight-click or CTRL+click to store the preset.\n\nMiddle-click or SHIFT+click to reset the preset.\n\nUse the Bank dropdown menu to select from Banks A, B, or C.\n\nStored presets are saved only on the current browser.`);
+            alert(`\t\t\t\t\t PRESET BUTTONS \t\t\t\t\n\nThis feature allows you to store up to 30 presets, with 10 presets per bank. To store a frequency:\n\nLeft-click to recall the preset.\nRight-click or CTRL+click to store the preset.\nMiddle-click or SHIFT+click to reset the preset.\n\nUse the Bank dropdown menu to select from Banks A, B, or C.\n\nStored presets are saved only on the current browser.`);
         }
     });
 
