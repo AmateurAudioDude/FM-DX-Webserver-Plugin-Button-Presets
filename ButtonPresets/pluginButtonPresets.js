@@ -209,6 +209,10 @@ if (targetElement) {
 
     if (!bankMenuBorderRightRadius) { dropdownContainer.querySelector('input').style.setProperty('border-top-right-radius', '0px'); dropdownContainer.querySelector('input').style.setProperty('border-bottom-right-radius', '0px'); }
 
+    if (bankMenuCustomWidth !== 'default') {
+        dropdownContainer.style.width = bankMenuCustomWidth;
+    }
+
     if (bankMenuPosition == 'before') {
         targetElement.parentNode.insertBefore(dropdownContainer, targetElement);
     } else {
@@ -231,10 +235,6 @@ function getTooltipValue() {
     // Check if #data-station-name exists and is visible
     if (dataStationNameElement && dataStationNameElement.offsetParent !== null) {
         return dataStationNameElement.textContent.trim();
-    }
-
-    if (bankMenuCustomWidth !== 'default') {
-        dropdownContainer.style.width = bankMenuCustomWidth;
     }
 
     // Fallback to #data-ps if #data-station-name doesn't exist or isn't visible
