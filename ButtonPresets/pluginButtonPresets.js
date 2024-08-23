@@ -1,11 +1,42 @@
 /*
-    Button Presets v1.0.0 by AAD
+    Button Presets v1.0.1 by AAD
     https://github.com/AmateurAudioDude
 */
+
+// ###################################### Start of migration code ######################################
+
+// Check if "buttonPresets" exists in localStorage
+const oldStorageKey = 'buttonPresets';
+const newStorageKey = 'buttonPresetsA';
+
+// Function to migrate old presets to new bank A
+function migratePresets() {
+  const oldData = JSON.parse(localStorage.getItem(oldStorageKey));
+
+  if (oldData) {
+    // Import old data to "buttonPresetsA"
+    localStorage.setItem(newStorageKey, JSON.stringify(oldData));
+    
+    // Remove the old key from localStorage
+    localStorage.removeItem(oldStorageKey);
+  }
+}
+
+// Migrate presets on script load
+migratePresets();
+
+// ###################################### End of migration code ######################################
 
 // Create a style element
 var styleButtonPresets = document.createElement('style');
 styleButtonPresets.innerHTML = `
+  /* Force hide dropdown menu in portrait mode */
+  @media only screen and (max-width: 768px) {
+      #button-presets-bank-dropdown {
+          display: none !important;
+      }
+  }
+
   @media only screen and (min-width: 960px) {
     .button-presets {
       margin-top: -12px;
@@ -52,7 +83,7 @@ styleButtonPresets.innerHTML = `
     bottom: 120%;
     left: 50%;
     transform: translateX(-50%);
-    padding: 6px 26px 6px 26px;
+    padding: 6px 26px;
     background-color: var(--color-3);
     color: #efeffe;
     border-radius: 15px;
@@ -70,110 +101,176 @@ styleButtonPresets.innerHTML = `
   }
 
   .tooltip-presets[data-tooltip=""]::after {
-    display: none; /* Hide tooltip if data-tooltip is empty */
+    display: none;
   }
 `;
 
 // Append the style to the head of the document
 document.head.appendChild(styleButtonPresets);
 
-var tooltipFirstLoad = false;
+var tooltipFirstLoad = false; // TODO: is it needed?
+const DISPLAY_KEY = 'buttonPresetsHidden';
 
 // Create a container for the buttons
 var buttonContainer = document.createElement("div");
 buttonContainer.id = "plugin-button-presets";
 buttonContainer.classList.add('button-presets', 'flex-container', 'flex-center', 'show-phone');
-buttonContainer.style.display = "flex"; // Arrange buttons side by side
-buttonContainer.style.flexWrap = "wrap"; // Wrap buttons if they overflow
-buttonContainer.style.gap = "4px"; // Space between buttons
+buttonContainer.style.display = "flex";
+buttonContainer.style.flexWrap = "wrap";
+buttonContainer.style.gap = "4px";
 buttonContainer.style.marginLeft = "6px";
 buttonContainer.style.marginRight = "6px";
 
-// Get stored button values and data-ps values from localStorage or initialise them
-const STORAGE_KEY = 'buttonPresets';
-const DISPLAY_KEY = 'buttonPresetsHidden';
-let storedData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { values: Array(10).fill(87.5), ps: Array(10).fill('') };
-let buttonValues = storedData.values;
-let psValues = storedData.ps;
+// Function to get stored button values and data-ps values from localStorage
+function getStoredData(bank) {
+  const key = `buttonPresets${bank}`;
+  return JSON.parse(localStorage.getItem(key)) || { values: Array(10).fill(87.5), ps: Array(10).fill('') };
+}
 
-// Create and add buttons
-for (let i = 0; i < 10; i++) {
+// Function to save button values and data-ps values to localStorage
+function saveToLocalStorage(bank, values, ps) {
+  const key = `buttonPresets${bank}`;
+  localStorage.setItem(key, JSON.stringify({ values: values, ps: ps }));
+}
+
+// Default to Bank A
+let currentBank = 'A';
+
+// Create a custom dropdown menu
+var dropdownContainer = document.createElement('div');
+dropdownContainer.classList.add('panel-50', 'w-50', 'no-bg', 'h-100', 'm-0', 'dropdown', 'hide-phone');
+dropdownContainer.id = 'button-presets-bank-dropdown'; // Dropdown ID
+
+var dropdownInput = document.createElement('input');
+dropdownInput.type = 'text';
+dropdownInput.placeholder = 'Bank A'; // Bank text
+dropdownInput.readOnly = true;
+dropdownInput.tabIndex = 0;
+dropdownContainer.appendChild(dropdownInput);
+
+var dropdownOptions = document.createElement('ul');
+dropdownOptions.classList.add('options', 'open-top');
+dropdownOptions.tabIndex = -1;
+['A', 'B', 'C'].forEach(bank => {
+  var option = document.createElement('li');
+  option.classList.add('option');
+  option.dataset.value = bank;
+  option.tabIndex = 0;
+  option.textContent = `Bank ${bank}`; // Bank text
+  dropdownOptions.appendChild(option);
+});
+dropdownContainer.appendChild(dropdownOptions);
+
+// Toggle dropdown options visibility
+dropdownInput.addEventListener('click', function() {
+  dropdownOptions.classList.toggle('opened');
+});
+
+// Update bank and input value when an option is selected
+dropdownOptions.addEventListener('click', function(event) {
+  if (event.target && event.target.matches('li.option')) {
+    currentBank = event.target.dataset.value;
+    dropdownInput.value = `Bank ${currentBank}`; // Bank text
+    updateButtons(); // Update the buttons when the bank changes
+    dropdownOptions.classList.remove('opened');
+  }
+});
+
+// Insert the dropdown menu before the specified element
+var targetElement = document.querySelector('.panel-50.no-bg.br-0.h-100.m-0.button-ims');
+if (targetElement) {
+  targetElement.parentNode.insertBefore(dropdownContainer, targetElement);
+}
+
+// Optional: Hide dropdown menu when clicking outside
+document.addEventListener('click', function(event) {
+  if (!dropdownContainer.contains(event.target)) {
+    dropdownOptions.classList.remove('opened');
+  }
+});
+
+// Update buttons based on the selected bank
+function updateButtons() {
+  buttonContainer.innerHTML = ''; // Clear existing buttons
+  const storedData = getStoredData(currentBank);
+  const buttonValues = storedData.values;
+  const psValues = storedData.ps;
+
+  for (let i = 0; i < 10; i++) {
     (function(index) {
-        // Create button
-        var button = document.createElement("button");
-        button.id = `setFrequencyButton${index}`;
-        
-        // Add tooltip class
-        button.classList.add('tooltip-presets', 'tooltip-presets-once');
-        button.setAttribute('data-tooltip', psValues[index]);
+      var button = document.createElement("button");
+      button.id = `setFrequencyButton${index}`;
+      button.classList.add('tooltip-presets', 'tooltip-presets-once');
+      button.setAttribute('data-tooltip', psValues[index]);
+      button.style.minWidth = "60px";
+      button.style.width = "8%";
+      button.style.height = "48px";
 
-        // Set width and height for button sizes
-        button.style.minWidth = "60px";
-        button.style.width = "8%";
-        button.style.height = "48px";
+      updateButton(button, buttonValues[index], index);
 
-        // Set the button text and tooltip on page load
+      button.addEventListener('click', function() {
+        var commandInput = document.getElementById('commandinput');
+        const presetInput = buttonValues[index];
+
+        if (socket.readyState === WebSocket.OPEN) {
+          tuneTo(presetInput);
+        }
+        checkBankASum();
+      });
+
+      button.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        var dataFrequencyElement = document.getElementById('data-frequency');
+        var dataPsElement = document.getElementById('data-ps');
+        var dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
+        var dataPs = dataPsElement ? dataPsElement.textContent : '';
+
+        buttonValues[index] = parseFloat(dataFrequency) || 87.5;
+        psValues[index] = dataPs;
         updateButton(button, buttonValues[index], index);
+        checkBankASum();
+      });
 
-        // Add event listeners for different click types
-        button.addEventListener('click', function() {
-            var commandInput = document.getElementById('commandinput');
-            const presetInput = buttonValues[index];
-            
-            if (socket.readyState === WebSocket.OPEN) {
-                socket.send("T" + (presetInput * 1000));
-            }
-        });
-
-        button.addEventListener('contextmenu', function(e) {
-            e.preventDefault(); // Prevent the default right-click menu
+      button.addEventListener('mousedown', function(e) {
+        if (e.button === 1 || e.ctrlKey || (e.shiftKey && e.button === 0)) {
+          if (e.button === 1 || (e.shiftKey && e.button === 0)) {
+            buttonValues[index] = 87.5;
+            psValues[index] = '';
+          } else if (e.ctrlKey) {
             var dataFrequencyElement = document.getElementById('data-frequency');
             var dataPsElement = document.getElementById('data-ps');
-            var dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5'; // Get the value from #data-frequency
-            var dataPs = dataPsElement ? dataPsElement.textContent : ''; // Get the value from #data-ps
+            var dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
+            var dataPs = dataPsElement ? dataPsElement.textContent : '';
 
             buttonValues[index] = parseFloat(dataFrequency) || 87.5;
             psValues[index] = dataPs;
-            updateButton(button, buttonValues[index], index);
-        });
-
-        button.addEventListener('mousedown', function(e) {
-                if (e.button === 1 || e.ctrlKey || (e.shiftKey && e.button === 0)) { // Middle-click, Control + Click, or Shift + Left-click
-                    if (e.button === 1 || (e.shiftKey && e.button === 0)) {
-                        buttonValues[index] = 87.5;
-                        psValues[index] = ''; // Reset associated ps value
-                } else if (e.ctrlKey) {
-                    var dataFrequencyElement = document.getElementById('data-frequency');
-                    var dataPsElement = document.getElementById('data-ps');
-                    var dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5'; // Get the value from #data-frequency
-                    var dataPs = dataPsElement ? dataPsElement.textContent : ''; // Get the value from #data-ps
-
-                    buttonValues[index] = parseFloat(dataFrequency) || 87.5;
-                    psValues[index] = dataPs;
-                }
-                updateButton(button, buttonValues[index], index);
-            }
-        });
-
-        // Function to update the button's text and save value
-        function updateButton(button, value, index) {
-            const psValue = psValues[index];
-            const displayText = psValue ? `${formatValue(value).trim()}<span id="button-preset-ps" style="display: block; margin-top: -2px; white-space: nowrap; overflow: hidden; font-weight: 600;">${psValue.trim()}</span>` : formatValue(value).trim();
-            button.innerHTML = displayText; // Update button text with frequency and psValue
-            button.setAttribute('data-tooltip', psValue.trim()); // Update data-tooltip attribute for tooltip
-            localStorage.setItem(STORAGE_KEY, JSON.stringify({ values: buttonValues, ps: psValues })); // Save updated values to localStorage
+          }
+          updateButton(button, buttonValues[index], index);
+          checkBankASum();
         }
+      });
 
-        // Function to format the value with conditional decimal places
-        function formatValue(value) {
-            const fixedValue = value.toFixed(2); // Format with two decimal places
-            return fixedValue.endsWith('0') ? fixedValue.slice(0, -1) : fixedValue; // Remove trailing zero if present
-        }
+      function updateButton(button, value, index) {
+        const psValue = psValues[index];
+        const displayText = psValue ? `${formatValue(value).trim()}<span id="button-preset-ps" style="display: block; margin-top: -2px; white-space: nowrap; overflow: hidden; font-weight: 600;">${psValue.trim()}</span>` : formatValue(value).trim();
+        button.innerHTML = displayText;
+        button.setAttribute('data-tooltip', psValue.trim());
+        saveToLocalStorage(currentBank, buttonValues, psValues);
+      }
 
-        // Append button to the container
-        buttonContainer.appendChild(button);
-    })(i); // Pass the current loop index to the IIFE
+      function formatValue(value) {
+        const fixedValue = value.toFixed(2);
+        return fixedValue.endsWith('0') ? fixedValue.slice(0, -1) : fixedValue;
+      }
+
+      buttonContainer.appendChild(button);
+    })(i);
+  }
 }
+
+// Set default bank to A and update buttons on load
+currentBank = 'A';
+updateButtons();
 
 // Find the container to insert the button container after
 var container = document.querySelector('#wrapper-outer #wrapper .flex-container');
@@ -190,14 +287,22 @@ function toggleButtonContainer() {
     if (isHidden) {
         var element = document.getElementById('plugin-button-presets');
         element.style.setProperty('display', 'none');
+        document.getElementById('button-presets-bank-dropdown').style.display = 'none';
+        var infoIconContainer = document.getElementById('button-presets-info-icon-container');
+        if (infoIconContainer) {
+            infoIconContainer.style.display = 'none';
+        }
     } else {
         var element = document.getElementById('plugin-button-presets');
         element.style.setProperty('display', 'flex');
+        if (window.innerWidth >= 768) { document.getElementById('button-presets-bank-dropdown').style.display = 'block'; }
+        var infoIconContainer = document.getElementById('button-presets-info-icon-container');
+        if (infoIconContainer) {
+            infoIconContainer.style.display = 'flex';
+        }
+        checkBankASum();
     }
 }
-
-// Call the toggle function on page load
-toggleButtonContainer();
 
 // Initial tooltip
 function oncePresetTooltips() {
@@ -296,3 +401,88 @@ function AdditionalCheckboxesButtonPresets() {
 // Display additional options in side menu and tooltips
 AdditionalCheckboxesButtonPresets();
 oncePresetTooltips();
+
+// Function to check if all preset values in bank A add up to 875
+function checkBankASum() {
+    // Fetch values for bank A
+    const storedData = getStoredData('A');
+    const buttonValues = storedData.values;
+
+    // Calculate the sum of all preset values
+    const sum = buttonValues.reduce((acc, value) => acc + value, 0);
+
+    // Check if the sum is equal to 875
+    if (sum === 875) {
+        showInfoIcon();
+    } else {
+        hideInfoIcon();
+    }
+}
+
+// Function to execute when the sum is 875
+function executeInfoCode() {
+    // Create a new div for the info icon
+    var infoIconContainer = document.createElement('div');
+    infoIconContainer.id = 'button-presets-info-icon-container'; // Assign an ID for later use
+    infoIconContainer.style.position = 'absolute';
+    infoIconContainer.style.bottom = '60px';
+    infoIconContainer.style.right = '36px';
+    infoIconContainer.style.display = 'flex';
+    infoIconContainer.style.flexDirection = 'column';
+    infoIconContainer.style.alignItems = 'center';
+    infoIconContainer.style.imageRendering = 'auto';
+
+    // Create the FontAwesome info icon
+    var infoIcon = document.createElement('i');
+    infoIcon.id = 'info-icon'; // Assign an ID to the icon itself
+    infoIcon.classList.add('fa-solid', 'fa-circle-question');
+    infoIcon.style.fontSize = '20px';
+    infoIcon.style.cursor = 'pointer';
+
+    // Add event listener to show alert when icon is clicked
+    infoIcon.addEventListener('click', function() {
+        if (typeof pluginThemedPopup !== 'undefined') {
+            alert(`<strong>PRESET BUTTONS</strong>
+            <i>This feature allows you to store up to 30 presets, with 10 presets per bank.
+            To store a frequency:</i>
+
+            <strong><i>Left-click</i></strong> to recall the preset.
+            <strong><i>Right-click</i></strong> or <strong><i>CTRL+click</i></strong> to store the preset.
+            <strong><i>Middle-click</i></strong> or <strong><i>SHIFT+click</i></strong> to reset the preset.
+            
+            Use the <b>Bank</b> dropdown menu to select from Banks <i>A</i>, <i>B</i>, or <i>C</i>.
+
+            <strong>Stored presets are saved only on the current browser.</strong><br>
+            `, 'Close');
+        } else {
+            alert(`\t\t\t\t\t PRESET BUTTONS \t\t\t\t\n\nThis feature allows you to store up to 30 presets, with 10 presets per bank. To store a frequency:\n\nLeft-click to recall the preset.\n\nRight-click or CTRL+click to store the preset.\n\nMiddle-click or SHIFT+click to reset the preset.\n\nUse the Bank dropdown menu to select from Banks A, B, or C.\n\nStored presets are saved only on the current browser.`);
+        }
+    });
+
+    // Append the icon to the container and the container to the body
+    infoIconContainer.appendChild(infoIcon);
+    document.body.appendChild(infoIconContainer);
+}
+
+// Function to hide the info icon
+function hideInfoIcon() {
+    var infoIconContainer = document.getElementById('button-presets-info-icon-container');
+    if (infoIconContainer) {
+        infoIconContainer.style.display = 'none';
+    }
+}
+
+// Function to show the info icon
+function showInfoIcon() {
+    var infoIconContainer = document.getElementById('button-presets-info-icon-container');
+    if (infoIconContainer) {
+        infoIconContainer.style.display = 'flex';
+    }
+}
+
+// Initialize the info icon and check the bank A presets sum
+executeInfoCode();
+checkBankASum();
+
+// Call the toggle function on page load
+toggleButtonContainer();
