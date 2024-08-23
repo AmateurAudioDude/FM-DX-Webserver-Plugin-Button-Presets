@@ -11,6 +11,7 @@ const bankMenuPaddingLeft = '15' // value in px
 const bankMenuPaddingRight = '0' // value in px
 const bankMenuBorderLeftRadius = true; // true, false
 const bankMenuBorderRightRadius = true; // true, false
+const bankMenuCustomWidth = 'default'; // default, value in px or %
 const optionHidePresetButtons = true; // true, false
 const infoIcon = true; // true, false
 
@@ -226,12 +227,16 @@ document.addEventListener('click', function(event) {
 function getTooltipValue() {
     const dataStationNameElement = document.getElementById('data-station-name');
     const dataPsElement = document.getElementById('data-ps');
-    
+
     // Check if #data-station-name exists and is visible
     if (dataStationNameElement && dataStationNameElement.offsetParent !== null) {
         return dataStationNameElement.textContent.trim();
     }
-    
+
+    if (bankMenuCustomWidth !== 'default') {
+        dropdownContainer.style.width = bankMenuCustomWidth;
+    }
+
     // Fallback to #data-ps if #data-station-name doesn't exist or isn't visible
     return dataPsElement ? dataPsElement.textContent.trim() : '';
 }
