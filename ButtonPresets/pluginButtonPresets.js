@@ -1,45 +1,14 @@
 /*
-    Button Presets v1.1.0 by AAD
-    https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
+    Button Presets v1.0.0 by AAD
+    https://github.com/AmateurAudioDude
 */
-
-//////////////////////////////////////////////////
-
-const bankMenuLocation = 'ims' // ims, bw, ant, eq, hidden
-const bankMenuPosition = 'after' // before, after
-const bankMenuPaddingLeft = '15' // value in px
-const bankMenuPaddingRight = '0' // value in px
-const bankMenuBorderLeftRadius = true; // true, false
-const bankMenuBorderRightRadius = true; // true, false
-const bankMenuCustomWidth = 'default'; // default, value in px or %
-const optionHidePresetButtons = true; // true, false
-const infoIcon = true; // true, false
-
-//////////////////////////////////////////////////
 
 // Create a style element
 var styleButtonPresets = document.createElement('style');
 styleButtonPresets.innerHTML = `
-  /* Prevent cropped text on mobile */
-  @media only screen and not (min-width: 960px) {
-      #plugin-button-presets button {
-          padding: 4px !important;
-      }
-  }
-
-  /* Force hide dropdown menu in portrait mode */
-  @media only screen and (max-width: 768px) {
-      #button-presets-bank-dropdown {
-          display: none !important;
-      }
-  }
-
   @media only screen and (min-width: 960px) {
     .button-presets {
       margin-top: -12px;
-    }
-    .button-text {
-      font-size: 14px;
     }
   }
 
@@ -83,7 +52,7 @@ styleButtonPresets.innerHTML = `
     bottom: 120%;
     left: 50%;
     transform: translateX(-50%);
-    padding: 6px 26px;
+    padding: 6px 26px 6px 26px;
     background-color: var(--color-3);
     color: #efeffe;
     border-radius: 15px;
@@ -101,7 +70,7 @@ styleButtonPresets.innerHTML = `
   }
 
   .tooltip-presets[data-tooltip=""]::after {
-    display: none;
+    display: none; /* Hide tooltip if data-tooltip is empty */
   }
 `;
 
@@ -109,339 +78,102 @@ styleButtonPresets.innerHTML = `
 document.head.appendChild(styleButtonPresets);
 
 var tooltipFirstLoad = false;
-const DISPLAY_KEY = 'buttonPresetsHidden';
 
 // Create a container for the buttons
 var buttonContainer = document.createElement("div");
 buttonContainer.id = "plugin-button-presets";
 buttonContainer.classList.add('button-presets', 'flex-container', 'flex-center', 'show-phone');
-buttonContainer.style.display = "flex";
-buttonContainer.style.flexWrap = "wrap";
-buttonContainer.style.gap = "4px";
+buttonContainer.style.display = "flex"; // Arrange buttons side by side
+buttonContainer.style.flexWrap = "wrap"; // Wrap buttons if they overflow
+buttonContainer.style.gap = "4px"; // Space between buttons
 buttonContainer.style.marginLeft = "6px";
 buttonContainer.style.marginRight = "6px";
 
-// Function to get stored button values, data-ps values, and images from localStorage
-function getStoredData(bank) {
-  const key = `buttonPresets${bank}`;
-  const data = JSON.parse(localStorage.getItem(key)) || { values: Array(10).fill(87.5), ps: Array(10).fill(''), images: Array(10).fill('') };
-  return data;
-}
+// Get stored button values and data-ps values from localStorage or initialise them
+const STORAGE_KEY = 'buttonPresets';
+const DISPLAY_KEY = 'buttonPresetsHidden';
+let storedData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { values: Array(10).fill(87.5), ps: Array(10).fill('') };
+let buttonValues = storedData.values;
+let psValues = storedData.ps;
 
-// Function to save button values, data-ps values, and images to localStorage
-function saveToLocalStorage(bank, buttonValues, psValues, buttonImages, tooltipValues) {
-    const sanitizedButtonValues = buttonValues.map(value => value === null ? "" : value);
-    const sanitizedPsValues = psValues.map(value => value === null ? "" : value);
-    const sanitizedButtonImages = buttonImages.map(value => value === null ? "" : value);
-    const sanitizedTooltipValues = tooltipValues.map(value => value === null ? "" : value);
-
-    localStorage.setItem(`buttonPresets${bank}`, JSON.stringify({
-        values: sanitizedButtonValues,
-        ps: sanitizedPsValues,
-        images: sanitizedButtonImages,
-        tooltips: sanitizedTooltipValues
-    }));
-}
-
-// Default to Bank A
-let currentBank = 'A';
-
-// Create a custom dropdown menu
-var dropdownContainer = document.createElement('div');
-dropdownContainer.classList.add('panel-50', 'w-50', 'no-bg', 'h-100', 'm-0', 'dropdown', 'hide-phone');
-dropdownContainer.id = 'button-presets-bank-dropdown'; // Dropdown ID
-
-var dropdownInput = document.createElement('input');
-dropdownInput.type = 'text';
-dropdownInput.placeholder = 'Bank A'; // Bank text
-dropdownInput.readOnly = true;
-dropdownInput.tabIndex = 0;
-dropdownContainer.appendChild(dropdownInput);
-
-var dropdownOptions = document.createElement('ul');
-dropdownOptions.classList.add('options', 'open-top');
-dropdownOptions.tabIndex = -1;
-['A', 'B', 'C'].forEach(bank => {
-  var option = document.createElement('li');
-  option.classList.add('option');
-  option.dataset.value = bank;
-  option.tabIndex = 0;
-  option.textContent = `Bank ${bank}`; // Bank text
-  dropdownOptions.appendChild(option);
-});
-dropdownContainer.appendChild(dropdownOptions);
-
-// Toggle dropdown options visibility
-dropdownInput.addEventListener('click', function() {
-  dropdownOptions.classList.toggle('opened');
-});
-
-// Update bank and input value when an option is selected
-dropdownOptions.addEventListener('click', function(event) {
-  if (event.target && event.target.matches('li.option')) {
-    currentBank = event.target.dataset.value;
-    dropdownInput.value = `Bank ${currentBank}`; // Bank text
-    updateButtons(); // Update the buttons when the bank changes
-    dropdownOptions.classList.remove('opened');
-  }
-});
-
-// Insert the dropdown menu before the specified element
-var targetElement;
-if (bankMenuLocation !== 'hidden') {
-    if (bankMenuLocation == 'ims') {
-        targetElement = document.querySelector('.panel-50.no-bg.br-0.h-100.m-0.button-ims');
-    } else if (bankMenuLocation == 'bw') {
-        targetElement = document.querySelector('#data-bw.panel-50');
-    } else if (bankMenuLocation == 'ant') {
-        targetElement = document.querySelector('#data-ant.panel-50');
-    } else if (bankMenuLocation == 'eq') {
-        targetElement = document.querySelector('.panel-50.no-bg.br-0.h-100.m-0.button-eq');
-    }
-}
-
-if (targetElement) {
-    
-    dropdownContainer.style.setProperty('margin-left', bankMenuPaddingLeft + 'px', 'important');
-    dropdownContainer.style.setProperty('margin-right', bankMenuPaddingRight + 'px', 'important');
-
-    if (!bankMenuBorderLeftRadius) { dropdownContainer.querySelector('input').style.setProperty('border-top-left-radius', '0px'); dropdownContainer.querySelector('input').style.setProperty('border-bottom-left-radius', '0px'); }
-
-    if (!bankMenuBorderRightRadius) { dropdownContainer.querySelector('input').style.setProperty('border-top-right-radius', '0px'); dropdownContainer.querySelector('input').style.setProperty('border-bottom-right-radius', '0px'); }
-
-    if (bankMenuPosition == 'before') {
-        targetElement.parentNode.insertBefore(dropdownContainer, targetElement);
-    } else {
-        targetElement.parentNode.insertBefore(dropdownContainer, targetElement.nextSibling);
-    }
-}
-
-// Optional: Hide dropdown menu when clicking outside
-document.addEventListener('click', function(event) {
-  if (!dropdownContainer.contains(event.target)) {
-    dropdownOptions.classList.remove('opened');
-  }
-});
-
-// Define the getTooltipValue function outside updateButtons
-function getTooltipValue() {
-    const dataStationNameElement = document.getElementById('data-station-name');
-    const dataPsElement = document.getElementById('data-ps');
-
-    // Check if #data-station-name exists and is visible
-    if (dataStationNameElement && dataStationNameElement.offsetParent !== null) {
-        return dataStationNameElement.textContent.trim();
-    }
-
-    if (bankMenuCustomWidth !== 'default') {
-        dropdownContainer.style.width = bankMenuCustomWidth;
-    }
-
-    // Fallback to #data-ps if #data-station-name doesn't exist or isn't visible
-    return dataPsElement ? dataPsElement.textContent.trim() : '';
-}
-
-// Update buttons based on the selected bank
-function updateButtons() {
-  buttonContainer.innerHTML = ''; // Clear existing buttons
-  const storedData = getStoredData(currentBank);
-  const buttonValues = storedData.values;
-  const psValues = storedData.ps;
-  const buttonImages = storedData.images || []; // Ensure buttonImages is an array
-  const tooltipValues = storedData.tooltips || []; // Ensure tooltipValues is an array
-
-  for (let i = 0; i < 10; i++) {
+// Create and add buttons
+for (let i = 0; i < 10; i++) {
     (function(index) {
-      var button = document.createElement("button");
-      button.id = `setFrequencyButton${index}`;
-      button.classList.add('tooltip-presets', 'tooltip-presets-once');
-      button.setAttribute('data-tooltip', tooltipValues[index] || psValues[index]); // Tooltip uses data-station-name if available, otherwise psValue
-      button.style.minWidth = "60px";
-      button.style.width = "8%";
-      button.style.height = "48px";
+        // Create button
+        var button = document.createElement("button");
+        button.id = `setFrequencyButton${index}`;
+        
+        // Add tooltip class
+        button.classList.add('tooltip-presets', 'tooltip-presets-once');
+        button.setAttribute('data-tooltip', psValues[index]);
 
-      updateButton(button, buttonValues[index], index);
+        // Set width and height for button sizes
+        button.style.minWidth = "60px";
+        button.style.width = "8%";
+        button.style.height = "48px";
 
-      button.addEventListener('click', function() {
-        var commandInput = document.getElementById('commandinput');
-        const presetInput = buttonValues[index];
-
-        if (socket.readyState === WebSocket.OPEN) {
-          tuneTo(presetInput);
-        }
-        checkBankASum();
-      });
-
-      button.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        var dataFrequencyElement = document.getElementById('data-frequency');
-        var dataPsElement = document.getElementById('data-ps');
-        var dataStationNameElement = document.getElementById('data-station-name');
-        var dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
-        var dataPs = dataPsElement ? dataPsElement.textContent : '';
-        var tooltipValue = (dataStationNameElement && dataStationNameElement.offsetParent !== null) ? dataStationNameElement.textContent : dataPs;
-
-        buttonValues[index] = parseFloat(dataFrequency) || 87.5;
-        psValues[index] = dataPs;
-        tooltipValues[index] = tooltipValue;
-        buttonImages[index] = getImageSrc();
+        // Set the button text and tooltip on page load
         updateButton(button, buttonValues[index], index);
-        checkBankASum();
-      });
 
-    button.addEventListener('mousedown', function(e) {
-        if (e.button === 1 || e.ctrlKey || (e.shiftKey && e.button === 0)) {
-            if (e.button === 1 || (e.shiftKey && e.button === 0)) {
-                buttonValues[index] = 87.5;
-                psValues[index] = '';
-                buttonImages[index] = '';
-                tooltipValues[index] = ''; // Reset the tooltip value as well
-            } else if (e.ctrlKey) {
-                var dataFrequencyElement = document.getElementById('data-frequency');
-                var dataPsElement = document.getElementById('data-ps');
-                var dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
-                var dataPs = dataPsElement ? dataPsElement.textContent : '';
-
-                buttonValues[index] = parseFloat(dataFrequency) || 87.5;
-                psValues[index] = dataPs;
-                buttonImages[index] = getImageSrc();
-                tooltipValues[index] = getTooltipValue() || '';  // Ensures tooltipValue is not null
+        // Add event listeners for different click types
+        button.addEventListener('click', function() {
+            var commandInput = document.getElementById('commandinput');
+            const presetInput = buttonValues[index];
+            
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send("T" + (presetInput * 1000));
             }
+        });
+
+        button.addEventListener('contextmenu', function(e) {
+            e.preventDefault(); // Prevent the default right-click menu
+            var dataFrequencyElement = document.getElementById('data-frequency');
+            var dataPsElement = document.getElementById('data-ps');
+            var dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5'; // Get the value from #data-frequency
+            var dataPs = dataPsElement ? dataPsElement.textContent : ''; // Get the value from #data-ps
+
+            buttonValues[index] = parseFloat(dataFrequency) || 87.5;
+            psValues[index] = dataPs;
             updateButton(button, buttonValues[index], index);
-            checkBankASum();
+        });
+
+        button.addEventListener('mousedown', function(e) {
+                if (e.button === 1 || e.ctrlKey || (e.shiftKey && e.button === 0)) { // Middle-click, Control + Click, or Shift + Left-click
+                    if (e.button === 1 || (e.shiftKey && e.button === 0)) {
+                        buttonValues[index] = 87.5;
+                        psValues[index] = ''; // Reset associated ps value
+                } else if (e.ctrlKey) {
+                    var dataFrequencyElement = document.getElementById('data-frequency');
+                    var dataPsElement = document.getElementById('data-ps');
+                    var dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5'; // Get the value from #data-frequency
+                    var dataPs = dataPsElement ? dataPsElement.textContent : ''; // Get the value from #data-ps
+
+                    buttonValues[index] = parseFloat(dataFrequency) || 87.5;
+                    psValues[index] = dataPs;
+                }
+                updateButton(button, buttonValues[index], index);
+            }
+        });
+
+        // Function to update the button's text and save value
+        function updateButton(button, value, index) {
+            const psValue = psValues[index];
+            const displayText = psValue ? `${formatValue(value).trim()}<span id="button-preset-ps" style="display: block; margin-top: -2px; white-space: nowrap; overflow: hidden; font-weight: 600;">${psValue.trim()}</span>` : formatValue(value).trim();
+            button.innerHTML = displayText; // Update button text with frequency and psValue
+            button.setAttribute('data-tooltip', psValue.trim()); // Update data-tooltip attribute for tooltip
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ values: buttonValues, ps: psValues })); // Save updated values to localStorage
         }
-    });
 
-    function updateButton(button, value, index) {
-      const psValue = psValues[index] || ''; // Ensure psValue is always used for button text
-      const tooltipValue = tooltipValues[index] || psValue; // Fallback to psValue if tooltipValue is undefined
-      const imageSrc = (buttonImages && buttonImages[index]) || ''; // Ensure imageSrc is a valid string
-      const padding = "6px";
-      const displayText = `${formatValue(value).trim()}<span id="button-preset-ps" style="display: block; margin-top: -2px; white-space: nowrap; overflow: hidden; font-weight: 500;">${psValue.trim()}</span>`;
-
-      button.style.position = "relative"; // Ensure button is positioned to contain the image
-      button.style.padding = padding;
-      button.style.backgroundColor = 'var(--color-1)';
-
-      // Remove existing image if present
-      const existingImg = button.querySelector('img');
-      if (existingImg) {
-        button.removeChild(existingImg);
-      }
-
-      // Remove existing text if present
-      const existingText = button.querySelector('.button-text');
-      if (existingText) {
-        button.removeChild(existingText);
-      }
-
-      // Append the image if it exists
-      if (imageSrc) {
-        const img = document.createElement('img');
-        img.src = imageSrc;
-        img.style.position = "absolute";
-        img.style.top = padding;
-        img.style.left = padding;
-        img.style.right = padding;
-        img.style.bottom = padding;
-        img.style.width = `calc(100% - ${padding} * 2)`;
-        img.style.height = `calc(100% - ${padding} * 2)`;
-        img.style.objectFit = "contain";
-        img.style.transition = "opacity 0.3s";
-        img.style.borderRadius = "6px";
-        button.appendChild(img);
-
-        // Create and append the text element
-        const textElement = document.createElement('span');
-        textElement.className = 'button-text';
-        textElement.innerHTML = displayText;
-        textElement.style.position = "absolute";
-        textElement.style.top = padding;
-        textElement.style.left = padding;
-        textElement.style.right = padding;
-        textElement.style.bottom = padding;
-        textElement.style.visibility = "hidden";
-        textElement.style.color = "var(--color-text)";
-        textElement.style.fontFamily = window.getComputedStyle(document.getElementById('data-ps')).fontFamily;
-        button.appendChild(textElement);
-
-        // Add hover effect for image and text
-        button.addEventListener('mouseover', function() {
-          button.style.backgroundColor = 'var(--color-3)';
-          img.style.opacity = "0.1";
-          textElement.style.visibility = "visible"; // Show text on hover
-        });
-        button.addEventListener('mouseout', function() {
-          button.style.backgroundColor = 'var(--color-1)';
-          img.style.opacity = "1"; // Reset opacity when not hovered
-          textElement.style.visibility = "hidden"; // Hide text when not hovered
-        });
-      } else {
-        // If no image, ensure text is visible and positioned correctly
-        const textElement = document.createElement('span');
-        textElement.className = 'button-text';
-        textElement.innerHTML = displayText;
-        textElement.style.position = "relative";
-        textElement.style.color = "var(--color-text)";
-        textElement.style.fontFamily = window.getComputedStyle(document.getElementById('data-ps')).fontFamily;
-        button.appendChild(textElement);
-
-        // Add hover effect for buttons without an image
-        button.addEventListener('mouseover', function() {
-          button.style.backgroundColor = 'var(--color-3)';
-        });
-        button.addEventListener('mouseout', function() {
-          button.style.backgroundColor = 'var(--color-1)';
-        });
-      }
-
-      button.setAttribute('data-tooltip', tooltipValue.trim());
-      saveToLocalStorage(currentBank, buttonValues, psValues, buttonImages, tooltipValues);
-    }
-
-      function formatValue(value) {
-        const fixedValue = value.toFixed(2);
-        return fixedValue.endsWith('0') ? fixedValue.slice(0, -1) : fixedValue;
-      }
-
-    // Function to determine if the image is local or external
-    function isImageLocal(imageUrl) {
-      try {
-        const imageUrlObj = new URL(imageUrl);
-        const siteOrigin = window.location.origin;
-        return imageUrlObj.origin === siteOrigin;
-      } catch (e) {
-        // Handle the case where the URL might be invalid or not absolute
-        return false;
-      }
-    }
-
-    // Function to get the image source and determine if it’s local or external
-    function getImageSrc() {
-      const logoImg = document.getElementById('station-logo');
-      if (logoImg && logoImg.src && !logoImg.src.startsWith('data:image/png;base64') && !logoImg.src.includes('default')) {
-        const imageUrl = logoImg.src;
-        if (isImageLocal(imageUrl)) {
-          // Handle local image
-          //console.log("imageLocal");
-          return new URL(imageUrl).pathname; // Store only the path
-        } else {
-          // Handle external image
-          //console.log("imageExternal");
-          return imageUrl; // Store the full URL
+        // Function to format the value with conditional decimal places
+        function formatValue(value) {
+            const fixedValue = value.toFixed(2); // Format with two decimal places
+            return fixedValue.endsWith('0') ? fixedValue.slice(0, -1) : fixedValue; // Remove trailing zero if present
         }
-      }
-      return '';
-    }
 
-      buttonContainer.appendChild(button);
-    })(i);
-  }
+        // Append button to the container
+        buttonContainer.appendChild(button);
+    })(i); // Pass the current loop index to the IIFE
 }
-
-// Set default bank to A and update buttons on load
-currentBank = 'A';
-updateButtons();
 
 // Find the container to insert the button container after
 var container = document.querySelector('#wrapper-outer #wrapper .flex-container');
@@ -458,31 +190,14 @@ function toggleButtonContainer() {
     if (isHidden) {
         var element = document.getElementById('plugin-button-presets');
         element.style.setProperty('display', 'none');
-        document.getElementById('button-presets-bank-dropdown').style.display = 'none';
-        var infoIconContainer = document.getElementById('button-presets-info-icon-container');
-
-        if (infoIconContainer) {
-            infoIconContainer.style.display = 'none';
-        }
-
     } else {
         var element = document.getElementById('plugin-button-presets');
         element.style.setProperty('display', 'flex');
-
-        if (window.innerWidth >= 768) {
-          var dropdown = document.getElementById('button-presets-bank-dropdown');
-          if (dropdown) {
-            dropdown.style.display = 'block';
-          }
-        }
-
-        var infoIconContainer = document.getElementById('button-presets-info-icon-container');
-        if (infoIconContainer) {
-            infoIconContainer.style.display = 'flex';
-        }
-        checkBankASum();
     }
 }
+
+// Call the toggle function on page load
+toggleButtonContainer();
 
 // Initial tooltip
 function oncePresetTooltips() {
@@ -579,96 +294,5 @@ function AdditionalCheckboxesButtonPresets() {
 }
 
 // Display additional options in side menu and tooltips
-if (optionHidePresetButtons) {
-    AdditionalCheckboxesButtonPresets();
-}
-
+AdditionalCheckboxesButtonPresets();
 oncePresetTooltips();
-
-// Function to check if all preset values in bank A add up to 875
-function checkBankASum() {
-    // Fetch values for bank A
-    const storedData = getStoredData('A');
-    const buttonValues = storedData.values;
-
-    // Calculate the sum of all preset values
-    const sum = buttonValues.reduce((acc, value) => acc + value, 0);
-
-    // Check if the sum is equal to 875
-    if (sum === 875) {
-        showInfoIcon();
-    } else {
-        hideInfoIcon();
-    }
-}
-
-// Function to execute when the sum is 875
-function executeInfoCode() {
-    // Create a new div for the info icon
-    var infoIconContainer = document.createElement('div');
-    infoIconContainer.id = 'button-presets-info-icon-container'; // Assign an ID for later use
-    infoIconContainer.style.position = 'absolute';
-    infoIconContainer.style.bottom = '60px';
-    infoIconContainer.style.right = '36px';
-    infoIconContainer.style.display = 'flex';
-    infoIconContainer.style.flexDirection = 'column';
-    infoIconContainer.style.alignItems = 'center';
-    infoIconContainer.style.imageRendering = 'auto';
-
-    // Create the FontAwesome info icon
-    var infoIcon = document.createElement('i');
-    infoIcon.id = 'info-icon'; // Assign an ID to the icon itself
-    infoIcon.classList.add('fa-solid', 'fa-circle-question');
-    infoIcon.style.fontSize = '20px';
-    infoIcon.style.cursor = 'pointer';
-
-    // Add event listener to show alert when icon is clicked
-    infoIcon.addEventListener('click', function() {
-        if (typeof pluginThemedPopup !== 'undefined') {
-            alert(`<strong>PRESET BUTTONS</strong>
-            <i>This feature allows you to store up to 30 presets, with 10 presets per bank.
-            To store a frequency:</i>
-
-            <strong><i>Left-click</i></strong> to recall the preset.
-            <strong><i>Right-click</i></strong> or <strong><i>CTRL+click</i></strong> to store the preset.
-            <strong><i>Middle-click</i></strong> or <strong><i>SHIFT+click</i></strong> to reset the preset.
-            
-            Use the <b>Bank</b> dropdown menu to select from Banks <i>A</i>, <i>B</i>, or <i>C</i>.
-
-            <strong>Stored presets are saved only on the current browser.</strong><br>
-            `, 'Close');
-        } else {
-            alert(`\t\t\t\t\t PRESET BUTTONS \t\t\t\t\n\nThis feature allows you to store up to 30 presets, with 10 presets per bank. To store a frequency:\n\nLeft-click to recall the preset.\nRight-click or CTRL+click to store the preset.\nMiddle-click or SHIFT+click to reset the preset.\n\nUse the Bank dropdown menu to select from Banks A, B, or C.\n\nStored presets are saved only on the current browser.`);
-        }
-    });
-
-    // Append the icon to the container and the container to the body
-    infoIconContainer.appendChild(infoIcon);
-    document.body.appendChild(infoIconContainer);
-}
-
-// Function to hide the info icon
-function hideInfoIcon() {
-    var infoIconContainer = document.getElementById('button-presets-info-icon-container');
-    if (infoIconContainer) {
-        infoIconContainer.style.display = 'none';
-    }
-}
-
-// Function to show the info icon
-function showInfoIcon() {
-    var infoIconContainer = document.getElementById('button-presets-info-icon-container');
-    if (infoIconContainer) {
-        infoIconContainer.style.display = 'flex';
-    }
-}
-
-// Initialize the info icon and check the bank A presets sum
-if (infoIcon) {
-    executeInfoCode();
-}
-
-checkBankASum();
-
-// Call the toggle function on page load
-toggleButtonContainer();
