@@ -1,5 +1,5 @@
 /*
-    Button Presets v1.1.1 by AAD
+    Button Presets v1.1.2 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -49,6 +49,28 @@ styleButtonPresets.innerHTML = `
       #plugin-button-presets {
           padding-right: 8px;
       }
+      /* Fix spacing when chat is enabled */
+      #wrapper-outer #wrapper .flex-container .panel-10.no-bg.m-0, .flex-container {
+          padding-bottom: 0px;
+      }
+      #wrapper-outer #wrapper .flex-container .panel-10.no-bg.m-0 .panel-10.no-bg.h-100 {
+          height: 80px !important;
+      }
+  }
+
+  /* Add spacing below bottom containers */
+  @media only screen and (min-width: 960px) {
+    #plugin-button-presets {
+      margin-top: 20px;
+    }
+    .button-text {
+      font-size: 14px;
+    }
+  }
+
+  /* Bottom padding that exists in panels.css:93 */
+  #plugin-button-presets {
+      margin-bottom: 10px;
   }
 
   /* Frosted glass effect */
@@ -76,15 +98,6 @@ styleButtonPresets.innerHTML = `
       #button-presets-bank-dropdown {
           display: none !important;
       }
-  }
-
-  @media only screen and (min-width: 960px) {
-    .button-presets {
-      margin-top: -12px;
-    }
-    .button-text {
-      font-size: 14px;
-    }
   }
 
   @media only screen and (min-height: 861px) {
