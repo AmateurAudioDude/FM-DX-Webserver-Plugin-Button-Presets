@@ -44,6 +44,13 @@ var defaultButtonPresetImagePath = ' data:image/png;base64,iVBORw0KGgoAAAANSUhEU
 // Create a style element
 var styleButtonPresets = document.createElement('style');
 styleButtonPresets.innerHTML = `
+  /* Fix for panels.css:93 */
+  @media only screen and (min-width: 960px) and (max-height: 860px) {
+      #plugin-button-presets {
+          padding-right: 8px;
+      }
+  }
+
   /* Frosted glass effect */
   #plugin-button-presets button, .tooltip-presets::after {
     backdrop-filter: blur(5px);
