@@ -290,6 +290,11 @@ function getTooltipValue() {
     return dataPsElement ? dataPsElement.textContent.trim() : '';
 }
 
+// Update buttons on orientation change
+function updateButtonsDelayed() {
+    setTimeout(updateButtons, 200);
+}
+
 // Update buttons based on the selected bank
 function updateButtons() {
   buttonContainer.innerHTML = ''; // Clear existing buttons
@@ -426,10 +431,18 @@ function updateButtons() {
           textElement.style.visibility = "hidden"; // Hide text when not hovered
         });
       } else {
+        if (displayDefaultLogo && window.matchMedia("(max-width: 860px) and (orientation: portrait)").matches) {
+            paddingMobile = "0px";
+        } else {
+            paddingMobile = "-8px"; // Default or landscape mode padding
+        }
+
+        // Event listener for orientation change
+        window.addEventListener('orientationchange', updateButtonsDelayed);
 
         // Display default logo
         if (displayDefaultLogo) {
-            const paddingDefaultLogo = "-8px";
+            const paddingDefaultLogo = paddingMobile;
             const img = document.createElement('img');
             img.src = imageSrc || defaultButtonPresetImagePath;
             img.style.position = "absolute";
@@ -441,13 +454,13 @@ function updateButtons() {
 
                 // Add hover effect for image and text
                 button.addEventListener('mouseover', function() {
-                  button.style.backgroundColor = 'var(--color-4-transparent)';
-                  img.style.opacity = "0.08";
-                  textElement.style.visibility = "visible"; // Show text on hover
+                    button.style.backgroundColor = 'var(--color-4-transparent)';
+                    img.style.opacity = "0.08";
+                    textElement.style.visibility = "visible"; // Show text on hover
                 });
                 button.addEventListener('mouseout', function() {
-                  button.style.backgroundColor = 'var(--color-1-transparent)';
-                  img.style.opacity = "0.12"; // Reset opacity when not hovered
+                    button.style.backgroundColor = 'var(--color-1-transparent)';
+                    img.style.opacity = "0.12"; // Reset opacity when not hovered
                 });
             }
 
