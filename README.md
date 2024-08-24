@@ -11,9 +11,13 @@ This plugin allows locally-stored frequency presets, displayed below general FM-
 
 #### Configuration options found in `pluginButtonPresets.js`
 
+v1.1.2
+------
+* Fixed button alignment when chat is disabled
+* Clean up code formatting
+
 v1.1.1
 ------
-
 * Using frosted glass effect to compliment FM-DX Webserver design
 * Added option to set default frequencies
 * Optional default logo when no logo is found
