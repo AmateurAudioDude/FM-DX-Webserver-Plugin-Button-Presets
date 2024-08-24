@@ -11,6 +11,13 @@ This plugin allows locally-stored frequency presets, displayed below general FM-
 
 #### Configuration options found in `pluginButtonPresets.js`
 
+v1.1.1
+------
+
+* Using frosted glass effect to compliment FM-DX Webserver design
+* Added option to set default frequencies
+* Optional default logo when no logo is found
+
 v1.1.0
 ------
 * Public release.
