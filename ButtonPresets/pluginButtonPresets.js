@@ -1,5 +1,5 @@
 /*
-    Button Presets v1.1.0 by AAD
+    Button Presets v1.1.1 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -13,13 +13,49 @@ const bankMenuBorderLeftRadius = true; // true, false
 const bankMenuBorderRightRadius = true; // true, false
 const bankMenuCustomWidth = 'default'; // default, value in px or %
 const optionHidePresetButtons = true; // true, false
+const displayDefaultLogo = true; // true, false
+const enableDefaultLogo = 'unnamed'; // all, named, unnamed
 const infoIcon = true; // true, false
+const defaultPresetData = {
+  values: [87.5, 87.5, 87.5, 87.5, 87.5, 87.5, 87.5, 87.5, 87.5, 87.5],
+  names: ['', '', '', '', '', '', '', '', '', ''],
+  urls: ['', '', '', '', '', '', '', '', '', '']
+};
+
+/*
+
+  defaultPresetData examples:
+
+  values: [99.7, ...
+  names: ['Example', ...
+  urls: ['/logos/Example.png', ...
+
+  values: [99.7, ...
+  names: ['Example', ...
+  urls: ['https://tef.noobish.eu/logos/EXA/Example.png', ...
+
+*/
 
 //////////////////////////////////////////////////
+
+var defaultButtonPresetImagePath = ' data:image/png;base64,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';
 
 // Create a style element
 var styleButtonPresets = document.createElement('style');
 styleButtonPresets.innerHTML = `
+  /* Frosted glass effect */
+  #plugin-button-presets button, .tooltip-presets::after {
+    backdrop-filter: blur(8px);
+    transition: 0.6s ease background-color;
+  }
+  #plugin-button-presets button:hover img {
+    transition: opacity 0.3s ease-out !important;
+  }
+  #plugin-button-presets button:hover {
+    backdrop-filter: blur(8px);
+    transition: 0.3s ease background-color;
+  }
+
   /* Prevent cropped text on mobile */
   @media only screen and not (min-width: 960px) {
       #plugin-button-presets button {
@@ -84,7 +120,7 @@ styleButtonPresets.innerHTML = `
     left: 50%;
     transform: translateX(-50%);
     padding: 6px 26px;
-    background-color: var(--color-3);
+    background-color: var(--color-4-transparent);
     color: #efeffe;
     border-radius: 15px;
     white-space: nowrap;
@@ -124,8 +160,13 @@ buttonContainer.style.marginRight = "6px";
 // Function to get stored button values, data-ps values, and images from localStorage
 function getStoredData(bank) {
   const key = `buttonPresets${bank}`;
-  const data = JSON.parse(localStorage.getItem(key)) || { values: Array(10).fill(87.5), ps: Array(10).fill(''), images: Array(10).fill('') };
-  return data;
+  var dataButtonPresets;
+  if (bank === "A") {
+    dataButtonPresets = JSON.parse(localStorage.getItem(key)) || { values: [...defaultPresetData.values], ps: [...defaultPresetData.names], images: [...defaultPresetData.urls] };
+  } else {
+      dataButtonPresets = JSON.parse(localStorage.getItem(key)) || { values: Array(10).fill(87.5), ps: Array(10).fill(''), images: Array(10).fill('') };
+  }
+  return dataButtonPresets;
 }
 
 // Function to save button values, data-ps values, and images to localStorage
@@ -321,7 +362,7 @@ function updateButtons() {
 
       button.style.position = "relative"; // Ensure button is positioned to contain the image
       button.style.padding = padding;
-      button.style.backgroundColor = 'var(--color-1)';
+      button.style.backgroundColor = 'var(--color-1-transparent)';
 
       // Remove existing image if present
       const existingImg = button.querySelector('img');
@@ -338,7 +379,7 @@ function updateButtons() {
       // Append the image if it exists
       if (imageSrc) {
         const img = document.createElement('img');
-        img.src = imageSrc;
+        img.src = imageSrc || defaultButtonPresetImagePath;
         img.style.position = "absolute";
         img.style.top = padding;
         img.style.left = padding;
@@ -347,7 +388,7 @@ function updateButtons() {
         img.style.width = `calc(100% - ${padding} * 2)`;
         img.style.height = `calc(100% - ${padding} * 2)`;
         img.style.objectFit = "contain";
-        img.style.transition = "opacity 0.3s";
+        img.style.transition = "opacity 0.8s";
         img.style.borderRadius = "6px";
         button.appendChild(img);
 
@@ -367,31 +408,69 @@ function updateButtons() {
 
         // Add hover effect for image and text
         button.addEventListener('mouseover', function() {
-          button.style.backgroundColor = 'var(--color-3)';
+          button.style.backgroundColor = 'var(--color-4-transparent)';
           img.style.opacity = "0.1";
           textElement.style.visibility = "visible"; // Show text on hover
         });
         button.addEventListener('mouseout', function() {
-          button.style.backgroundColor = 'var(--color-1)';
+          button.style.backgroundColor = 'var(--color-1-transparent)';
           img.style.opacity = "1"; // Reset opacity when not hovered
           textElement.style.visibility = "hidden"; // Hide text when not hovered
         });
       } else {
+
+        // Display default logo
+        if (displayDefaultLogo) {
+            const paddingDefaultLogo = "-8px";
+            const img = document.createElement('img');
+            img.src = imageSrc || defaultButtonPresetImagePath;
+            img.style.position = "absolute";
+
+            if (enableDefaultLogo !== 'all' && (enableDefaultLogo === 'unnamed' && psValues[index]) || (enableDefaultLogo === 'named' && !psValues[index])) {
+                img.style.opacity = "0";
+            } else {
+                img.style.opacity = "0.12";
+
+                // Add hover effect for image and text
+                button.addEventListener('mouseover', function() {
+                  button.style.backgroundColor = 'var(--color-4-transparent)';
+                  img.style.opacity = "0.08";
+                  textElement.style.visibility = "visible"; // Show text on hover
+                });
+                button.addEventListener('mouseout', function() {
+                  button.style.backgroundColor = 'var(--color-1-transparent)';
+                  img.style.opacity = "0.12"; // Reset opacity when not hovered
+                });
+            }
+
+            img.style.top = paddingDefaultLogo;
+            img.style.left = paddingDefaultLogo;
+            img.style.right = paddingDefaultLogo;
+            img.style.bottom = paddingDefaultLogo;
+            img.style.width = `calc(100% - ${paddingDefaultLogo} * 2)`;
+            img.style.height = `calc(100% - ${paddingDefaultLogo} * 2)`;
+            img.style.objectFit = "contain";
+            img.style.transition = "opacity 0.8s";
+            img.style.borderRadius = "0px";
+            button.appendChild(img);
+        }
+
         // If no image, ensure text is visible and positioned correctly
         const textElement = document.createElement('span');
         textElement.className = 'button-text';
         textElement.innerHTML = displayText;
         textElement.style.position = "relative";
         textElement.style.color = "var(--color-text)";
+        textElement.style.textShadow = '2px 2px 4px rgba(0, 0, 0, 0.8)';
         textElement.style.fontFamily = window.getComputedStyle(document.getElementById('data-ps')).fontFamily;
         button.appendChild(textElement);
 
         // Add hover effect for buttons without an image
         button.addEventListener('mouseover', function() {
-          button.style.backgroundColor = 'var(--color-3)';
+          button.style.backgroundColor = 'var(--color-4-transparent)';
         });
         button.addEventListener('mouseout', function() {
-          button.style.backgroundColor = 'var(--color-1)';
+          button.style.backgroundColor = 'var(--color-1-transparent)';
         });
       }
 
@@ -400,6 +479,9 @@ function updateButtons() {
     }
 
       function formatValue(value) {
+        if (value === undefined) {
+            value = 87.5;
+        }
         const fixedValue = value.toFixed(2);
         return fixedValue.endsWith('0') ? fixedValue.slice(0, -1) : fixedValue;
       }
@@ -593,9 +675,10 @@ function checkBankASum() {
 
     // Calculate the sum of all preset values
     const sum = buttonValues.reduce((acc, value) => acc + value, 0);
+    const sumDefault = defaultPresetData.values.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
     // Check if the sum is equal to 875
-    if (sum === 875) {
+    if (sum === 875 || sum === sumDefault) {
         showInfoIcon();
     } else {
         hideInfoIcon();
