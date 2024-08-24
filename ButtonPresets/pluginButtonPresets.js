@@ -45,14 +45,14 @@ var styleButtonPresets = document.createElement('style');
 styleButtonPresets.innerHTML = `
   /* Frosted glass effect */
   #plugin-button-presets button, .tooltip-presets::after {
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(5px);
     transition: 0.6s ease background-color;
   }
   #plugin-button-presets button:hover img {
     transition: opacity 0.3s ease-out !important;
   }
   #plugin-button-presets button:hover {
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(5px);
     transition: 0.3s ease background-color;
   }
 
