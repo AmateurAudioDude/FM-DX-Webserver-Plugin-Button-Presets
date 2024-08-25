@@ -1,5 +1,5 @@
 /*
-    Button Presets v1.1.2 by AAD
+    Button Presets v1.1.3 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -362,6 +362,37 @@ function updateButtons() {
         checkBankASum();
       });
       
+      // Handle keyboard events for SHIFT + S and SHIFT + R
+      document.addEventListener('keydown', function(e) {
+        var isButtonFocused = document.activeElement === button;
+
+        if (isButtonFocused) {
+          if (e.shiftKey && e.key === 'S') {
+            // SHIFT + S key combination
+            var dataFrequencyElement = document.getElementById('data-frequency');
+            var dataPsElement = document.getElementById('data-ps');
+            var dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
+            var dataPs = dataPsElement ? dataPsElement.textContent : '';
+            
+            buttonValues[index] = parseFloat(dataFrequency) || 87.5;
+            psValues[index] = dataPs;
+            buttonImages[index] = getImageSrc();
+            tooltipValues[index] = getTooltipValue() || ''; // Ensures tooltipValue is not null
+            updateButton(button, buttonValues[index], index);
+            checkBankASum();
+          } else if (e.shiftKey && e.key === 'R') {
+            // SHIFT + R key combination
+            buttonValues[index] = 87.5;
+            psValues[index] = '';
+            buttonImages[index] = '';
+            tooltipValues[index] = ''; // Reset the tooltip value as well
+            updateButton(button, buttonValues[index], index);
+            checkBankASum();
+          }
+        }
+      });
+
+      // Handle mouse events
       button.addEventListener('mousedown', function(e) {
         if (e.button === 1 || e.ctrlKey || (e.shiftKey && e.button === 0)) {
           if (e.button === 1 || (e.shiftKey && e.button === 0)) {
@@ -615,9 +646,9 @@ function oncePresetTooltips() {
     if (!document.querySelector('.tooltip-presets-once')) { return; }
     if (!/Mobi|Android|iPhone|iPad|iPod|Opera Mini/i.test(navigator.userAgent)) {
       var tooltipText = `
-            <strong><i>Left-click</i></strong> to recall the preset.<br>
-            <strong><i>Right-click</i></strong> or <strong><i>CTRL+click</i></strong> to store the preset.<br>
-            <strong><i>Middle-click</i></strong> or <strong><i>SHIFT+click</i></strong> to reset the preset.<br>
+            <strong><i>Left-click</i></strong> or <strong><i>ENTER</i></strong> to recall the preset.<br>
+            <strong><i>Right-click</i></strong>, <strong><i>CTRL+click</i></strong>, or <strong><i>SHIFT+S</i></strong> to store the preset.<br>
+            <strong><i>Middle-click</i></strong> or <strong><i>SHIFT+click</i></strong>, or <strong><i>SHIFT+R</i></strong> to reset the preset.<br>
             <strong>Stored presets do not affect other browsers.</strong>
             `;
     } else {
@@ -752,16 +783,16 @@ function executeInfoCode() {
             <i>This feature allows you to store up to 30 presets, with 10 presets per bank.
             To store a frequency:</i>
 
-            <strong><i>Left-click</i></strong> to recall the preset.
-            <strong><i>Right-click</i></strong> or <strong><i>CTRL+click</i></strong> to store the preset.
-            <strong><i>Middle-click</i></strong> or <strong><i>SHIFT+click</i></strong> to reset the preset.
+            <strong><i>Left-click</i></strong> or <strong><i>ENTER</i></strong> to recall the preset.
+            <strong><i>Right-click</i></strong>, <strong><i>CTRL+click</i></strong>, or <strong><i>SHIFT+S</i></strong> to store the preset.
+            <strong><i>Middle-click</i></strong>, <strong><i>SHIFT+click</i></strong>, or <strong><i>SHIFT+R</i></strong> to reset the preset.
             
             Use the <b>Bank</b> dropdown menu to select from Banks <i>A</i>, <i>B</i>, or <i>C</i>.
 
             <strong>Stored presets are saved only on the current browser.</strong><br>
             `, 'Close');
     } else {
-      alert(`\t\t\t\t\t PRESET BUTTONS \t\t\t\t\n\nThis feature allows you to store up to 30 presets, with 10 presets per bank. To store a frequency:\n\nLeft-click to recall the preset.\nRight-click or CTRL+click to store the preset.\nMiddle-click or SHIFT+click to reset the preset.\n\nUse the Bank dropdown menu to select from Banks A, B, or C.\n\nStored presets are saved only on the current browser.`);
+      alert(`\t\t\t\t\t PRESET BUTTONS \t\t\t\t\n\nThis feature allows you to store up to 30 presets, with 10 presets per bank. To store a frequency:\n\nLeft-click or ENTER to recall the preset.\nRight-click, CTRL+click, or SHIFT+S to store the preset.\nMiddle-click, SHIFT+click, or SHIFT+R to reset the preset.\n\nUse the Bank dropdown menu to select from Banks A, B, or C.\n\nStored presets are saved only on the current browser.`);
     }
   });
   
