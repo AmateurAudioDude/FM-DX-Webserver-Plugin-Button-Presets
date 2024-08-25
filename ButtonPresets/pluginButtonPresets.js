@@ -1,5 +1,5 @@
 /*
-    Button Presets v1.1.3 by AAD
+    Button Presets v1.1.4 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -12,7 +12,7 @@ const bankMenuPaddingRight = '0' // value in px
 const bankMenuBorderLeftRadius = true; // true, false
 const bankMenuBorderRightRadius = true; // true, false
 const bankMenuCustomWidth = 'default'; // default, value in px or %
-const optionHidePresetButtons = true; // true, false
+const optionHidePresetButtons = false; // true, false
 const displayDefaultLogo = true; // true, false
 const enableDefaultLogo = 'unnamed'; // all, named, unnamed
 const infoIcon = true; // true, false
@@ -44,128 +44,140 @@ var defaultButtonPresetImagePath = ' data:image/png;base64,iVBORw0KGgoAAAANSUhEU
 // Create a style element
 var styleButtonPresets = document.createElement('style');
 styleButtonPresets.innerHTML = `
-  /* Preserve bottom margin (panels.css:93) */
-  @media only screen and (min-width: 960px) and (max-height: 860px) {
-      #plugin-button-presets {
-          padding-right: 8px;
-      }
-      /* Fix spacing when chat is enabled */
-      #wrapper-outer #wrapper .flex-container .panel-10.no-bg.m-0, .flex-container {
-          padding-bottom: 0px;
-      }
-      #wrapper-outer #wrapper .flex-container .panel-10.no-bg.m-0 .panel-10.no-bg.h-100 {
-          height: 80px !important;
-      }
-  }
+/* Frosted glass effect */
+#plugin-button-presets button,
+.tooltip-presets::after {
+  backdrop-filter: blur(5px);
+  transition: 0.6s ease background-color;
+}
 
-  /* Add spacing below bottom containers */
-  @media only screen and (min-width: 960px) {
-    #plugin-button-presets {
-      margin-top: 20px;
-    }
-    .button-text {
-      font-size: 14px;
-    }
-  }
+#plugin-button-presets button:hover {
+  transition: 0.3s ease background-color;
+}
 
-  /* Bottom padding that exists in panels.css:93 */
+#plugin-button-presets button:hover img {
+  transition: opacity 0.3s ease-out !important;
+}
+
+/* Tooltip styling */
+.tooltip-presets {
+  position: relative;
+  flex-grow: .1;
+  margin: 0 4px;
+}
+
+.tooltip-presets::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 26px;
+  background-color: var(--color-4-transparent);
+  color: #efeffe;
+  border-radius: 15px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.tooltip-presets:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+.tooltip-presets[data-tooltip=""]::after {
+  display: none;
+}
+
+/* Media Queries */
+
+/* Preserve bottom margin (panels.css:93) */
+@media only screen and (min-width: 960px) and (max-height: 860px) {
   #plugin-button-presets {
-      margin-bottom: 10px;
+    padding-right: 8px;
   }
 
-  /* Frosted glass effect */
-  #plugin-button-presets button, .tooltip-presets::after {
-    backdrop-filter: blur(5px);
-    transition: 0.6s ease background-color;
-  }
-  #plugin-button-presets button:hover img {
-    transition: opacity 0.3s ease-out !important;
-  }
-  #plugin-button-presets button:hover {
-    backdrop-filter: blur(5px);
-    transition: 0.3s ease background-color;
+  /* Fix spacing when chat is enabled */
+  #wrapper-outer #wrapper .flex-container .panel-10.no-bg.m-0 {
+    padding-bottom: 0;
   }
 
-  /* Prevent cropped text on mobile */
-  @media only screen and not (min-width: 960px) {
-      #plugin-button-presets button {
-          padding: 4px !important;
-      }
+  #wrapper-outer #wrapper .flex-container .panel-10.no-bg.m-0 .panel-10.no-bg.h-100 {
+    height: 80px !important;
+  }
+}
+
+/* Add spacing below bottom containers */
+@media only screen and (min-width: 768px) {
+  #plugin-button-presets {
+    margin-top: 20px;
+    margin-bottom: 20px;
   }
 
-  /* Force hide dropdown menu in portrait mode */
-  @media only screen and (max-width: 768px) {
-      #button-presets-bank-dropdown {
-          display: none !important;
-      }
+  .button-text {
+    font-size: 14px;
+  }
+}
+
+/* Mobile device spacing */
+@media only screen and (max-width: 480px) {
+  #plugin-button-presets {
+    margin-bottom: 20px;
+  }
+}
+
+/* Prevent cropped text on mobile */
+@media only screen and not (min-width: 960px) {
+  #plugin-button-presets button {
+    padding: 4px !important;
+  }
+}
+
+/* Force hide dropdown menu in portrait mode */
+@media only screen and (max-width: 768px) {
+  #button-presets-bank-dropdown {
+    display: none !important;
+  }
+}
+
+@media only screen and (min-height: 861px) {
+  .button-presets {
+    margin-top: 20px;
+  }
+}
+
+/* Adjustments for screen width */
+@media only screen and (max-width: 800px) {
+  .button-presets {
+    margin-bottom: 24px;
   }
 
-  @media only screen and (min-height: 861px) {
-    .button-presets {
-      margin-top: 20px;
-    }
+  #button-preset-ps {
+    font-size: 0.8em;
   }
+}
 
-  @media only screen and (max-width: 800px) {
-    .button-presets {
-      margin-bottom: 24px;
-    }
-    #button-preset-ps {
-      font-size: 0.8em;
-    }
+/* Correct tooltips for mobile devices in portrait mode */
+@media only screen and (max-width: 480px) {
+  #setFrequencyButton5::after,
+  #setFrequencyButton6::after,
+  #setFrequencyButton7::after,
+  #setFrequencyButton8::after,
+  #setFrequencyButton9::after {
+    top: 120%;
+    bottom: inherit !important;
   }
-
-  /* Correct tooltips for mobile devices in portrait mode */
-  @media only screen and (max-width: 480px) {
-    #setFrequencyButton5::after,
-    #setFrequencyButton6::after,
-    #setFrequencyButton7::after,
-    #setFrequencyButton8::after,
-    #setFrequencyButton9::after {
-      top: 120%;
-      bottom: inherit !important;
-    }
-  }
-
-  /* Tooltip styling */
-  .tooltip-presets {
-    position: relative;
-    flex-grow: .1;
-    margin: 0 4px;
-  }
-
-  .tooltip-presets::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 120%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 6px 26px;
-    background-color: var(--color-4-transparent);
-    color: #efeffe;
-    border-radius: 15px;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .tooltip-presets:hover::after {
-    opacity: .99;
-    visibility: visible;
-  }
-
-  .tooltip-presets[data-tooltip=""]::after {
-    display: none;
-  }
+}
 `;
 // Append the style to the head of the document
 document.head.appendChild(styleButtonPresets);
 
 var tooltipFirstLoad = false;
-const DISPLAY_KEY = 'buttonPresetsHidden';
+const DISPLAY_KEY_ButtonPresets = 'buttonPresetsHidden';
 
 // Create a container for the buttons
 var buttonContainer = document.createElement("div");
@@ -575,11 +587,9 @@ function updateButtons() {
           const imageUrl = logoImg.src;
           if (isImageLocal(imageUrl)) {
             // Handle local image
-            //console.log("imageLocal");
             return new URL(imageUrl).pathname; // Store only the path
           } else {
             // Handle external image
-            //console.log("imageExternal");
             return imageUrl; // Store the full URL
           }
         }
@@ -606,7 +616,7 @@ if (document.getElementById('rt-container')) {
 // Function to toggle the visibility of the button container
 function toggleButtonContainer() {
   // Check the localStorage value
-  const isHidden = JSON.parse(localStorage.getItem(DISPLAY_KEY)) == true;
+  const isHidden = JSON.parse(localStorage.getItem(DISPLAY_KEY_ButtonPresets)) == true;
   if (isHidden) {
     var element = document.getElementById('plugin-button-presets');
     element.style.setProperty('display', 'none');
@@ -714,7 +724,7 @@ function oncePresetTooltips() {
   });
 }
 
-// #################### SIDE BAR MENU SETTINGS #################### \\
+// #################### SIDE BAR MENU SETTINGS #################### //
 
 // ********** Display additional options in side menu **********
 function AdditionalCheckboxesButtonPresets() {
@@ -742,20 +752,20 @@ function AdditionalCheckboxesButtonPresets() {
   }
   insertHtmlAfterSecondCheckbox();
   
-  var isButtonPresetsHidden = localStorage.getItem(DISPLAY_KEY);
+  var isButtonPresetsHidden = localStorage.getItem(DISPLAY_KEY_ButtonPresets);
   if (isButtonPresetsHidden === "true") {
     $("#hide-preset-buttons").prop("checked", true);
   }
   
   $("#hide-preset-buttons").change(function() {
     var isChecked = $(this).is(":checked");
-    localStorage.setItem(DISPLAY_KEY, isChecked);
+    localStorage.setItem(DISPLAY_KEY_ButtonPresets, isChecked);
     toggleButtonContainer();
   });
 }
 
 // Display additional options in side menu and tooltips
-if (optionHidePresetButtons) {
+if (!optionHidePresetButtons) {
   AdditionalCheckboxesButtonPresets();
 }
 
@@ -849,3 +859,18 @@ checkBankASum();
 
 // Call the toggle function on page load
 toggleButtonContainer();
+
+// Replace any missing logos with default logo
+const containerButtonPresets = document.getElementById('plugin-button-presets');
+
+if (containerButtonPresets) {
+  containerButtonPresets.querySelectorAll('img').forEach(img => {
+    img.onerror = () => {
+      img.src = defaultButtonPresetImagePath;
+      img.style.filter = 'grayscale(100%)';
+      img.style.maxWidth = '92px';
+      img.style.maxHeight = '36px';
+      img.style.opacity = '0.5';
+    };
+  });
+}
