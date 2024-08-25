@@ -11,6 +11,10 @@ This plugin allows locally-stored frequency presets, displayed below general FM-
 
 #### Configuration options found in `pluginButtonPresets.js`
 
+v1.1.3
+------
+* Keyboard shortcuts added: SHIFT + S to store preset, SHIFT + R to reset preset
+
 v1.1.2
 ------
 * Fixed button alignment when chat is disabled
