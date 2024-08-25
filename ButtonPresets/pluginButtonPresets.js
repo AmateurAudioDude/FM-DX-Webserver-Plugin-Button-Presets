@@ -499,7 +499,20 @@ function updateButtons() {
           }
           
           // Event listener for orientation change
-          window.addEventListener('orientationchange', updateButtonsDelayed);
+          document.addEventListener("DOMContentLoaded", function () {
+              function debounce(func, wait) {
+                  let timeout;
+                  return function(...args) {
+                      clearTimeout(timeout);
+                      timeout = setTimeout(() => func.apply(this, args), wait);
+                  };
+              }
+              
+              const debouncedUpdateButtons = debounce(updateButtonsDelayed, 400);
+              
+              // Add debounced event listener for orientationchange
+              window.addEventListener('orientationchange', debouncedUpdateButtons);
+          });
           
           // Display default logo
           if (displayDefaultLogo) {
