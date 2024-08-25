@@ -126,7 +126,7 @@ styleButtonPresets.innerHTML = `
 /* Mobile device spacing */
 @media only screen and (max-width: 480px) {
   #plugin-button-presets {
-    margin-bottom: 20px;
+    margin-bottom: 40px;
   }
 }
 
@@ -153,7 +153,7 @@ styleButtonPresets.innerHTML = `
 /* Adjustments for screen width */
 @media only screen and (max-width: 800px) {
   .button-presets {
-    margin-bottom: 24px;
+    margin-bottom: 40px;
   }
 
   #button-preset-ps {
