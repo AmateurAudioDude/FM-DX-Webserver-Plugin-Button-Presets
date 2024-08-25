@@ -44,7 +44,7 @@ var defaultButtonPresetImagePath = ' data:image/png;base64,iVBORw0KGgoAAAANSUhEU
 // Create a style element
 var styleButtonPresets = document.createElement('style');
 styleButtonPresets.innerHTML = `
-  /* Fix for panels.css:93 */
+  /* Preserve bottom margin (panels.css:93) */
   @media only screen and (min-width: 960px) and (max-height: 860px) {
       #plugin-button-presets {
           padding-right: 8px;
@@ -161,7 +161,6 @@ styleButtonPresets.innerHTML = `
     display: none;
   }
 `;
-
 // Append the style to the head of the document
 document.head.appendChild(styleButtonPresets);
 
@@ -616,6 +615,18 @@ function toggleButtonContainer() {
     
     if (infoIconContainer) {
       infoIconContainer.style.display = 'none';
+
+      var styleButtonPresetsHide = document.createElement('style');
+      styleButtonPresetsHide.innerHTML = `
+        /* Preserve bottom margin (panels.css:93) */
+        @media only screen and (min-width: 960px) and (max-height: 860px) {
+            #wrapper-outer #wrapper .flex-container .panel-10.no-bg.m-0 .panel-10.no-bg.h-100 {
+                height: 120px !important;
+            }
+        }
+      `;
+      // Append the style to the head of the document
+      document.head.appendChild(styleButtonPresetsHide);
     }
     
   } else {
@@ -632,6 +643,18 @@ function toggleButtonContainer() {
     var infoIconContainer = document.getElementById('button-presets-info-icon-container');
     if (infoIconContainer) {
       infoIconContainer.style.display = 'flex';
+
+      var styleButtonPresetsHide = document.createElement('style');
+      styleButtonPresetsHide.innerHTML = `
+        /* Preserve bottom margin (panels.css:93) */
+        @media only screen and (min-width: 960px) and (max-height: 860px) {
+            #wrapper-outer #wrapper .flex-container .panel-10.no-bg.m-0 .panel-10.no-bg.h-100 {
+                height: 80px !important;
+            }
+        }
+      `;
+      // Append the style to the head of the document
+      document.head.appendChild(styleButtonPresetsHide);
     }
     checkBankASum();
   }
