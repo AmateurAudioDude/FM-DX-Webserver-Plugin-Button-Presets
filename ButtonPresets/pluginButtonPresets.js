@@ -143,7 +143,8 @@ styleButtonPresets.innerHTML = `
 
 /* Force hide dropdown menu in portrait mode */
 @media only screen and (max-width: 768px) {
-  #button-presets-bank-dropdown {
+  #button-presets-bank-dropdown,
+  #button-presets-info-icon-container {
     display: none !important;
   }
 }
