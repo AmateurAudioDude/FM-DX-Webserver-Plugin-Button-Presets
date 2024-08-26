@@ -468,6 +468,7 @@ function updateButtons() {
           img.style.objectFit = "contain";
           img.style.transition = "opacity 0.8s";
           img.style.borderRadius = "6px";
+          button.style.userSelect = 'none';
           button.appendChild(img);
           
           // Create and append the text element
@@ -551,7 +552,14 @@ function updateButtons() {
             img.style.objectFit = "contain";
             img.style.transition = "opacity 0.8s";
             img.style.borderRadius = "0px";
+            button.style.userSelect = 'none';
             button.appendChild(img);
+            
+            img.addEventListener('mousedown', (e) => {
+              if (e.button === 0) {
+                    e.preventDefault(); // Prevent the default drag behavior
+                }
+            });
           }
           
           // If no image, ensure text is visible and positioned correctly
@@ -889,5 +897,11 @@ if (containerButtonPresets) {
       img.style.maxHeight = '36px';
       img.style.opacity = '0.5';
     };
+
+    img.addEventListener('mousedown', (e) => {
+      if (e.button === 0) {
+            e.preventDefault(); // Prevent the default drag behavior
+        }
+    });
   });
 }
