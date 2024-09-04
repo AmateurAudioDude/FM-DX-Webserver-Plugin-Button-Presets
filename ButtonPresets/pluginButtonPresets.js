@@ -1,5 +1,5 @@
 /*
-    Button Presets v1.1.4 by AAD
+    Button Presets v1.1.5 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -839,19 +839,32 @@ function executeInfoCode() {
   infoIcon.addEventListener('click', function() {
     if (typeof pluginThemedPopup !== 'undefined') {
       alert(`<strong>PRESET BUTTONS</strong>
+
             <i>This feature allows you to store up to 30 presets, with 10 presets per bank.
             To store a frequency:</i>
 
             <strong><i>Left-click</i></strong> or <strong><i>ENTER</i></strong> to recall the preset.
             <strong><i>Right-click</i></strong>, <strong><i>CTRL+click</i></strong>, or <strong><i>SHIFT+S</i></strong> to store the preset.
             <strong><i>Middle-click</i></strong>, <strong><i>SHIFT+click</i></strong>, or <strong><i>SHIFT+R</i></strong> to reset the preset.
-            
+
             Use the <b>Bank</b> dropdown menu to select from Banks <i>A</i>, <i>B</i>, or <i>C</i>.
 
             <strong>Stored presets are saved only on the current browser.</strong><br>
             `, 'Close');
     } else {
-      alert(`\t\t\t\t\t PRESET BUTTONS \t\t\t\t\n\nThis feature allows you to store up to 30 presets, with 10 presets per bank. To store a frequency:\n\nLeft-click or ENTER to recall the preset.\nRight-click, CTRL+click, or SHIFT+S to store the preset.\nMiddle-click, SHIFT+click, or SHIFT+R to reset the preset.\n\nUse the Bank dropdown menu to select from Banks A, B, or C.\n\nStored presets are saved only on the current browser.`);
+      alertButtonPresets(`<strong>PRESET BUTTONS</strong>
+
+            <i>This feature allows you to store up to 30 presets, with 10 presets per bank.
+            To store a frequency:</i>
+
+            <strong><i>Left-click</i></strong> or <strong><i>ENTER</i></strong> to recall the preset.
+            <strong><i>Right-click</i></strong>, <strong><i>CTRL+click</i></strong>, or <strong><i>SHIFT+S</i></strong> to store the preset.
+            <strong><i>Middle-click</i></strong>, <strong><i>SHIFT+click</i></strong>, or <strong><i>SHIFT+R</i></strong> to reset the preset.
+
+            Use the <b>Bank</b> dropdown menu to select from Banks <i>A</i>, <i>B</i>, or <i>C</i>.
+
+            <strong>Stored presets are saved only on the current browser.</strong><br>
+            `, 'Close');
     }
   });
   
@@ -906,3 +919,89 @@ if (containerButtonPresets) {
     });
   });
 }
+
+/*
+    Themed Popups v1.0.0 by AAD
+    https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Themed-Popups
+*/
+
+var styleElementButtonPresets = document.createElement('style');
+var cssCodeThemedPopupsButtonPresets = `
+/* Themed Popups CSS */
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color-2); /* Background */
+    color: var(--color-main-bright); /* Text */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transition: opacity 0.3s ease-in;
+    z-index: 9999;
+}
+
+.popup-content {
+    text-align: center;
+}
+
+.popup button {
+    margin-top: 10px;
+}
+
+.popup.open {
+    opacity: .99;
+}
+`;
+styleElementButtonPresets.appendChild(document.createTextNode(cssCodeThemedPopupsButtonPresets));
+document.head.appendChild(styleElementButtonPresets);
+
+// Function to create the alert popup
+function alertButtonPresets(popupMessage, popupButton) {
+    if (typeof popupButton === 'undefined') {
+        popupButton = 'OK';
+    }
+    if (!popupOpened) { // Check if a popup is not already open
+        popup = document.createElement('div');
+        popup.classList.add('popup');
+        popup.innerHTML = `<div class="popup-content">${popupMessage.replace(/\n/g, '<br>')}<button id="popup-close">${popupButton}</button></div>`;
+        document.body.appendChild(popup);
+
+        var closeButton = popup.querySelector('#popup-close');
+        closeButton.addEventListener('click', closePopup);
+
+        popup.addEventListener('click', function(event) {
+            event.stopPropagation(); // Prevent event propagation
+        });
+
+        popupOpened = true; // Set popupOpened flag to true
+
+        // Trigger the fade-in effect
+        setTimeout(function() {
+            popup.classList.add('open');
+        }, 10);
+    }
+}
+
+// Global variables for popup state
+var popupOpened = false;
+var popup;
+
+// Function to close the popup
+function closePopup(event) {
+    event.stopPropagation(); // Prevent event propagation
+    popupOpened = false; // Set popupOpened flag to false
+    popup.classList.remove('open'); // Fade out
+    setTimeout(function() {
+        popup.remove();
+    }, 300); // Remove after fade-out transition
+}
+
+// Event listener for ESC key to close popup
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && popupOpened) {
+        closePopup(event);
+    }
+});
