@@ -735,6 +735,7 @@ function updateButtons() {
       })(i);
     } // i
   } // iAll
+  createImportExportButtons();
 }
 
 // Set default bank to A and update buttons on load
@@ -1236,25 +1237,27 @@ function createImportExportButtons() {
 
   // Add the buttons to the #plugin-button-presets element
   const pluginButtonPresets = document.querySelector('#plugin-button-presets');
-  pluginButtonPresets.appendChild(importButton);
-  pluginButtonPresets.appendChild(exportButton);
+  if (pluginButtonPresets !== null) {
+    pluginButtonPresets.appendChild(importButton);
+    pluginButtonPresets.appendChild(exportButton);
 
 
-  // Add hover effect for the #plugin-button-presets
-  pluginButtonPresets.addEventListener('mouseover', () => {
-    importButton.style.display = 'inline-block';
-    exportButton.style.display = 'inline-block';
-  });
-
-  if (!/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-    pluginButtonPresets.addEventListener('mouseout', () => {
-      importButton.style.display = 'none';
-      exportButton.style.display = 'none';
+    // Add hover effect for the #plugin-button-presets
+    pluginButtonPresets.addEventListener('mouseover', () => {
+      importButton.style.display = 'inline-block';
+      exportButton.style.display = 'inline-block';
     });
 
-    // Initially hide the buttons
-    importButton.style.display = 'none';
-    exportButton.style.display = 'none';
+    if (!/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+      pluginButtonPresets.addEventListener('mouseout', () => {
+        importButton.style.display = 'none';
+        exportButton.style.display = 'none';
+      });
+
+      // Initially hide the buttons
+      importButton.style.display = 'none';
+      exportButton.style.display = 'none';
+    }
   }
 }
 
