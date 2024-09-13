@@ -1,5 +1,5 @@
 /*
-    Button Presets v1.2.0 by AAD
+    Button Presets v1.2.1 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -418,7 +418,8 @@ function updateButtons() {
           const presetInput = buttonValues[index];
           
           if (socket.readyState === WebSocket.OPEN) {
-            tuneTo(presetInput);
+            // tuneTo(presetInput); causes rounding error
+            socket.send("T" + ((presetInput).toFixed(3) * 1000));
           }
           checkBankASum();
         });
@@ -668,7 +669,26 @@ function updateButtons() {
           if (value === undefined) {
             value = 87.5;
           }
-          const fixedValue = value.toFixed(2);
+
+          //   0-27 MHz : 3 decimal places
+          //  27-76 MHz : 2 decimal places
+          // 76-108 MHz : 1 decimal place
+          let fixedValue;
+
+          switch (true) {
+            case (value <= 27):
+              fixedValue = value.toFixed(4);
+              break;
+            case (value > 27 && value < 76):
+              fixedValue = value.toFixed(3);
+              break;
+            case (value >= 76 && value <= 108):
+              fixedValue = value.toFixed(2);
+              break;
+            default:
+              fixedValue = value.toFixed(3);
+          }
+
           return fixedValue.endsWith('0') ? fixedValue.slice(0, -1) : fixedValue;
         }
         
