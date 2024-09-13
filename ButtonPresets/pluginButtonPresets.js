@@ -863,7 +863,7 @@ function oncePresetTooltips() {
 // #################### SIDE BAR MENU SETTINGS #################### //
 
 // ********** Display additional options in side menu **********
-function AdditionalCheckboxesDisplayAll() { // ########## SHOW ALL BUTTON PRESETS ##########
+function AdditionalCheckboxesDisplayAll() { // ########## SHOW ALL PRESET BUTTONS ##########
     // Insert HTML after second element with class 'form-group checkbox'
     function insertHtmlAfterSecondCheckbox() {
         // Select all elements with class 'form-group checkbox'
@@ -876,7 +876,7 @@ function AdditionalCheckboxesDisplayAll() { // ########## SHOW ALL BUTTON PRESET
             newDiv.className = 'form-group checkbox';
             newDiv.innerHTML = `
                 <input type="checkbox" tabindex="0" id="show-all-preset-buttons">
-                <label for="show-all-preset-buttons">Show All Button Presets</label>
+                <label for="show-all-preset-buttons">Show All Preset Buttons</label>
             `;
             
             // Insert new element after second 'form-group checkbox'
