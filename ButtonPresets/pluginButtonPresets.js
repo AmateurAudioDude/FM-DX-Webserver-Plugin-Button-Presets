@@ -1,5 +1,5 @@
 /*
-    Button Presets v1.2.1 by AAD
+    Button Presets v1.2.2 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -12,9 +12,9 @@ const bankMenuPaddingRight = '0' // value in px
 const bankMenuBorderLeftRadius = true; // true, false
 const bankMenuBorderRightRadius = true; // true, false
 const bankMenuCustomWidth = 'default'; // default, value in px or %
-const bankDisplayAll = false; // true, false
 const bankName = 'Bank'; // dropdown menu name
 const optionHidePresetButtons = false; // true, false
+const optionHideDisplayAll = false; // true, false
 const displayDefaultLogo = true; // true, false
 const enableDefaultLogo = 'unnamed'; // all, named, unnamed
 const infoIcon = true; // true, false
@@ -39,6 +39,9 @@ const defaultPresetData = {
   urls: ['https://tef.noobish.eu/logos/EXA/Example.png', ...
 
 */
+
+// Initial value
+var bankDisplayAll = false;
 
 // Global variables for other plugins
 pluginButtonPresets = true;
@@ -204,17 +207,25 @@ styleButtonPresets.innerHTML = `
 document.head.appendChild(styleButtonPresets);
 
 // 30 button display
-document.addEventListener('DOMContentLoaded', () => {
-    if (bankDisplayAll) {
-        const styleElement = document.createElement('style');
-        styleElement.textContent = `
-            #plugin-button-presets.button-presets {
-                gap: 8px !important;
-            }
-        `;
-        document.head.appendChild(styleElement);
-    }
-});
+function bankDisplayAllGap() {
+  if (bankDisplayAll) {
+      const styleElement = document.createElement('style');
+      styleElement.textContent = `
+          #plugin-button-presets.button-presets {
+              gap: 8px !important;
+          }
+      `;
+      document.head.appendChild(styleElement);
+  } else {
+      const styleElement = document.createElement('style');
+      styleElement.textContent = `
+          #plugin-button-presets.button-presets {
+              gap: 4px !important;
+          }
+      `;
+      document.head.appendChild(styleElement);
+  }
+}
 
 var tooltipFirstLoad = false;
 const DISPLAY_KEY_ButtonPresets = 'buttonPresetsHidden';
@@ -850,6 +861,92 @@ function oncePresetTooltips() {
 }
 
 // #################### SIDE BAR MENU SETTINGS #################### //
+
+// ********** Display additional options in side menu **********
+function AdditionalCheckboxesDisplayAll() { // ########## SHOW ALL BUTTON PRESETS ##########
+    // Insert HTML after second element with class 'form-group checkbox'
+    function insertHtmlAfterSecondCheckbox() {
+        // Select all elements with class 'form-group checkbox'
+        const checkboxes = document.querySelectorAll('.modal-panel-content .form-group.checkbox');
+        
+        // Check if there are at least two such elements
+        if (checkboxes.length >= 2) {
+            // Create new HTML element
+            const newDiv = document.createElement('div');
+            newDiv.className = 'form-group checkbox';
+            newDiv.innerHTML = `
+                <input type="checkbox" tabindex="0" id="show-all-preset-buttons">
+                <label for="show-all-preset-buttons">Show All Button Presets</label>
+            `;
+            
+            // Insert new element after second 'form-group checkbox'
+            const secondCheckbox = checkboxes[1];
+            secondCheckbox.insertAdjacentElement('afterend', newDiv);
+        } else {
+            console.warn('There are less than two elements with class "form-group checkbox".');
+        }
+    }
+    insertHtmlAfterSecondCheckbox();
+
+    var isDisplayAll = localStorage.getItem("buttonPresetsDisplayAll");
+    if (isDisplayAll === "true") {
+        $("#show-all-preset-buttons").prop("checked", true);
+    }
+
+    $("#show-all-preset-buttons").change(function() {
+        var isChecked = $(this).is(":checked");
+        localStorage.setItem("buttonPresetsDisplayAll", isChecked);
+        setDisplayAll();
+    });
+
+    function setDisplayAll() {
+        if(localStorage.getItem('buttonPresetsDisplayAll') != 'true') {
+          currentBank = 'A';
+          bankDisplayAll = false;
+          bankDisplayAllGap();
+          toggleButtonContainer();
+          updateButtons();
+          console.log("buttonPresetsDisplayAll = false");
+        } else {
+          bankDisplayAll = true;
+          bankDisplayAllGap();
+          toggleButtonContainer();
+          document.getElementById('button-presets-bank-dropdown').style.display = 'none';
+          updateButtons();
+          console.log("buttonPresetsDisplayAll = true");
+        }
+    }
+
+    // Create a MutationObserver instance
+    const observerBackgroundImage = new MutationObserver((mutationsList) => {
+        for (const mutation of mutationsList) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                const bodyElement = document.body;
+
+                // Check if background style is set
+                if (window.getComputedStyle(bodyElement).background !== 'none') {
+                    // Stop observing once background is set
+                    observerBackgroundImage.disconnect();
+                    
+                    // Run function
+                    setDisplayAll();
+                }
+            }
+        }
+    });
+    // Configuration of observer
+    const config = {
+        attributes: true,           // Observe attribute changes
+        attributeFilter: ['style'], // Only observe changes to 'style' attribute
+    };
+    // Start observer
+    observerBackgroundImage.observe(document.body, config);
+}
+
+// Display additional options in side menu and tooltips
+if (!optionHideDisplayAll) {
+  AdditionalCheckboxesDisplayAll();
+}
 
 // ********** Display additional options in side menu **********
 function AdditionalCheckboxesButtonPresets() {
