@@ -13,6 +13,11 @@ This plugin allows locally-stored frequency presets, displayed below general FM-
 
 ![popup](https://github.com/user-attachments/assets/ad910fdb-ae7d-4b4c-aea4-9e6acfd13b56)
 
+v1.2.0
+------
+* Added import/export presets
+* Added option to show all presets
+
 v1.1.5
 ------
 * Added themed popup
