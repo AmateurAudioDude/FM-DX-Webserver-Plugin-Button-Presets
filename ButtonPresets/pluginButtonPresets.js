@@ -1189,13 +1189,13 @@ function importLocalStorageFromFile(file) {
       setTimeout(() => {
           createImportExportButtons();
       }, 100);
-
+      
       checkImageErrors();
-
-      if (typeof sendToast === 'function') { sendToast('success', 'Preset Button Import', 'Preset data successfully imported.', false, false); }
+      
+      if (typeof sendToast === 'function') { sendToast('success', 'Preset Buttons Import', 'Preset data successfully imported.', false, false); }
       console.log('Button Preset LocalStorage updated successfully');
     } catch (e) {
-      if (typeof sendToast === 'function') { sendToast('error', 'Preset Button Import', 'Error importing preset data.', false, false); }
+      if (typeof sendToast === 'function') { sendToast('error', 'Preset Buttons Import', 'Error importing preset data.', false, false); }
       console.error('Unable to import localStorage preset data');
     }
   };
