@@ -1107,23 +1107,27 @@ toggleButtonContainer();
 // Replace any missing logos with default logo
 const containerButtonPresets = document.getElementById('plugin-button-presets');
 
-if (containerButtonPresets) {
-  containerButtonPresets.querySelectorAll('img').forEach(img => {
-    img.onerror = () => {
-      img.src = defaultButtonPresetImagePath;
-      img.style.filter = 'grayscale(100%)';
-      img.style.maxWidth = '92px';
-      img.style.maxHeight = '36px';
-      img.style.opacity = '0.5';
-    };
+function checkImageErrors() {
+  if (containerButtonPresets) {
+    containerButtonPresets.querySelectorAll('img').forEach(img => {
+      img.onerror = () => {
+        img.src = defaultButtonPresetImagePath;
+        img.style.filter = 'grayscale(100%)';
+        img.style.maxWidth = '92px';
+        img.style.maxHeight = '36px';
+        img.style.opacity = '0.5';
+      };
 
-    img.addEventListener('mousedown', (e) => {
-      if (e.button === 0) {
-            e.preventDefault(); // Prevent the default drag behavior
-        }
+      img.addEventListener('mousedown', (e) => {
+        if (e.button === 0) {
+              e.preventDefault(); // Prevent the default drag behavior
+          }
+      });
     });
-  });
+  }
 }
+
+checkImageErrors();
 
 // Export presets to file
 function exportLocalStorageToFile() {
@@ -1186,10 +1190,12 @@ function importLocalStorageFromFile(file) {
           createImportExportButtons();
       }, 100);
 
-      if (typeof sendToast === 'function') { sendToast('success', 'Preset Buttons Import', 'Preset data successfully imported.', false, false); }
+      checkImageErrors();
+
+      if (typeof sendToast === 'function') { sendToast('success', 'Preset Button Import', 'Preset data successfully imported.', false, false); }
       console.log('Button Preset LocalStorage updated successfully');
     } catch (e) {
-      if (typeof sendToast === 'function') { sendToast('error', 'Preset Buttons Import', 'Error importing preset data.', false, false); }
+      if (typeof sendToast === 'function') { sendToast('error', 'Preset Button Import', 'Error importing preset data.', false, false); }
       console.error('Unable to import localStorage preset data');
     }
   };
