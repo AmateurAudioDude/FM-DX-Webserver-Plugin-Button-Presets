@@ -197,6 +197,10 @@ styleButtonPresets.innerHTML = `
   transition: opacity 0.8s !important;
 }
 
+.w-50 {
+    min-width: 50px !important;
+}
+
 /* 30 button display */
 #plugin-button-presets.button-presets {
   display: flex;
@@ -272,7 +276,7 @@ let currentBank = 'A';
 
 // Create a custom dropdown menu
 var dropdownContainer = document.createElement('div');
-dropdownContainer.classList.add('panel-50', 'w-50', 'no-bg', 'h-100', 'm-0', 'dropdown', 'hide-phone');
+dropdownContainer.classList.add('panel-50', 'w-50', 'no-bg', 'h-100', 'm-0', 'dropdown', 'dropdown-up', 'hide-phone');
 dropdownContainer.id = 'button-presets-bank-dropdown'; // Dropdown ID
 
 var dropdownInput = document.createElement('input');
