@@ -1,5 +1,5 @@
 /*
-    Button Presets v1.2.2 by AAD
+    Button Presets v1.2.3 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -433,7 +433,7 @@ function updateButtons() {
           const presetInput = buttonValues[index];
           
           if (socket.readyState === WebSocket.OPEN) {
-            // tuneTo(presetInput); causes rounding error
+            // "tuneTo(presetInput);" causes rounding error
             socket.send("T" + ((presetInput).toFixed(3) * 1000));
           }
           checkBankASum();
@@ -454,6 +454,8 @@ function updateButtons() {
           buttonImages[index] = getImageSrc();
           updateButton(button, buttonValues[index], index);
           checkBankASum();
+          if (typeof sendToast === 'function') { sendToast('info', 'Preset Buttons', `Frequency <strong>${buttonValues[index]} MHz</strong> saved to preset bank <b>${currentBank}</b>, button <b>#${(index + 1)}</b>.`, false, false); }
+          console.log("Preset saved:", buttonValues[index], currentBank, (index + 1));
         });
         
         // Handle keyboard events for SHIFT + S and SHIFT + R
@@ -759,6 +761,8 @@ function toggleButtonContainer() {
   // Check the localStorage value
   const isHidden = JSON.parse(localStorage.getItem(DISPLAY_KEY_ButtonPresets)) == true;
   if (isHidden) {
+    if (typeof sendToast === 'function') { sendToast('info', 'Preset Buttons', 'Preset Buttons hidden.', false, false); }
+    console.log('Button Preset plugin hidden');
     var element = document.getElementById('plugin-button-presets');
     element.style.setProperty('display', 'none');
     document.getElementById('button-presets-bank-dropdown').style.display = 'none';
@@ -781,6 +785,8 @@ function toggleButtonContainer() {
     }
     
   } else {
+    if (typeof sendToast === 'function') { sendToast('info', 'Preset Buttons', 'Preset Buttons restored.', false, false); }
+    console.log('Button Preset plugin restored');
     var element = document.getElementById('plugin-button-presets');
     element.style.setProperty('display', 'flex');
     
@@ -1180,9 +1186,11 @@ function importLocalStorageFromFile(file) {
           createImportExportButtons();
       }, 100);
 
+      if (typeof sendToast === 'function') { sendToast('success', 'Preset Button Import', 'Preset data successfully imported.', false, false); }
       console.log('Button Preset LocalStorage updated successfully');
     } catch (e) {
-      console.error('Error importing localStorage data:', e);
+      if (typeof sendToast === 'function') { sendToast('error', 'Preset Button Import', 'Error importing preset data.', false, false); }
+      console.error('Unable to import localStorage preset data');
     }
   };
 
