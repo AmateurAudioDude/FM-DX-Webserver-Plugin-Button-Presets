@@ -896,7 +896,7 @@ function AdditionalCheckboxesDisplayAll() { // ########## SHOW ALL PRESET BUTTON
             newDiv.className = 'form-group checkbox';
             newDiv.innerHTML = `
                 <input type="checkbox" tabindex="0" id="show-all-preset-buttons">
-                <label for="show-all-preset-buttons">Show All Preset Buttons</label>
+                <label class="tooltip" for="show-all-preset-buttons" data-tooltip="Enable to display all preset banks on screen.">Show All Preset Buttons</label>
             `;
             
             // Insert new element after second 'form-group checkbox'
@@ -982,7 +982,7 @@ function AdditionalCheckboxesButtonPresets() {
       newDiv.className = 'form-group checkbox';
       newDiv.innerHTML = `
                 <input type="checkbox" tabindex="0" id="hide-preset-buttons">
-                <label for="hide-preset-buttons">Hide Preset Buttons</label>
+                <label class="tooltip" for="hide-preset-buttons" data-tooltip="Enable if you do not want to use preset buttons.">Hide Preset Buttons</label>
             `;
       
       // Insert new element after second 'form-group checkbox'
