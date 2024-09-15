@@ -982,7 +982,7 @@ function AdditionalCheckboxesButtonPresets() {
       newDiv.className = 'form-group checkbox';
       newDiv.innerHTML = `
                 <input type="checkbox" tabindex="0" id="hide-preset-buttons">
-                <label class="tooltip" for="hide-preset-buttons" data-tooltip="Enable if you do not want to use preset buttons.">Hide Preset Buttons</label>
+                <label class="tooltip" for="hide-preset-buttons" data-tooltip="Enable if you do not want to use the preset buttons.">Hide Preset Buttons</label>
             `;
       
       // Insert new element after second 'form-group checkbox'
