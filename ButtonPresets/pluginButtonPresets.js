@@ -201,6 +201,14 @@ styleButtonPresets.innerHTML = `
     min-width: 50px !important;
 }
 
+/* Move import/export if not enough width */
+@media only screen and (max-width: 1300px) {
+  #export-button-preset,
+  #import-button-preset {
+   left: -8px;
+  }
+}
+
 /* 30 button display */
 #plugin-button-presets.button-presets {
   display: flex;
@@ -378,6 +386,7 @@ function getTooltipValue() {
 // Update buttons on orientation change
 function updateButtonsDelayed() {
   setTimeout(updateButtons, 200);
+  setTimeout(checkImageErrors, 200);
 }
 
 // Update buttons based on the selected bank
