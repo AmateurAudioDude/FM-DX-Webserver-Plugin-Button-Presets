@@ -1,5 +1,5 @@
 /*
-    Button Presets v1.2.3 by AAD
+    Button Presets v1.2.4 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -766,12 +766,14 @@ if (document.getElementById('rt-container')) {
 }
 
 // Function to toggle the visibility of the button container
-function toggleButtonContainer() {
+function toggleButtonContainer(statusToast) {
   // Check the localStorage value
   const isHidden = JSON.parse(localStorage.getItem(DISPLAY_KEY_ButtonPresets)) == true;
   if (isHidden) {
-    if (typeof sendToast === 'function') { sendToast('info', 'Preset Buttons', 'Preset Buttons hidden.', false, false); }
-    console.log('Button Preset plugin hidden');
+    if (typeof sendToast === 'function') {
+      sendToast('info', 'Preset Buttons', 'Preset Buttons hidden.', false, false);
+      console.log('Button Preset plugin hidden');
+    }
     var element = document.getElementById('plugin-button-presets');
     element.style.setProperty('display', 'none');
     document.getElementById('button-presets-bank-dropdown').style.display = 'none';
@@ -794,8 +796,10 @@ function toggleButtonContainer() {
     }
     
   } else {
-    if (typeof sendToast === 'function') { sendToast('info', 'Preset Buttons', 'Preset Buttons restored.', false, false); }
-    console.log('Button Preset plugin restored');
+    if (typeof sendToast === 'function' && statusToast) {
+      sendToast('info', 'Preset Buttons', 'Preset Buttons restored.', false, false);
+      console.log('Button Preset plugin restored');
+    }
     var element = document.getElementById('plugin-button-presets');
     element.style.setProperty('display', 'flex');
     
@@ -1002,7 +1006,7 @@ function AdditionalCheckboxesButtonPresets() {
   $("#hide-preset-buttons").change(function() {
     var isChecked = $(this).is(":checked");
     localStorage.setItem(DISPLAY_KEY_ButtonPresets, isChecked);
-    toggleButtonContainer();
+    toggleButtonContainer(true);
   });
 }
 
