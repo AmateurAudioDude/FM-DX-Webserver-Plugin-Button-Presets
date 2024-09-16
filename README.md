@@ -13,6 +13,10 @@ This plugin allows locally-stored frequency presets, displayed below general FM-
 
 ![popup](https://github.com/user-attachments/assets/ad910fdb-ae7d-4b4c-aea4-9e6acfd13b56)
 
+v1.2.4
+------
+* Minor bug fixes
+
 v1.2.3
 ------
 * Added toast notifications if available (FM-DX Webserver v1.2.8+)
