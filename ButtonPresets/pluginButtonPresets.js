@@ -1,5 +1,5 @@
 /*
-    Button Presets v1.2.4 by AAD
+    Button Presets v1.2.5 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -894,7 +894,7 @@ function AdditionalCheckboxesDisplayAll() { // ########## SHOW ALL PRESET BUTTON
         const checkboxes = document.querySelectorAll('.modal-panel-content .form-group.checkbox');
         
         // Check if there are at least two such elements
-        if (checkboxes.length >= 2) {
+        if (checkboxes.length > 0) {
             // Create new HTML element
             const newDiv = document.createElement('div');
             newDiv.className = 'form-group checkbox';
@@ -903,9 +903,9 @@ function AdditionalCheckboxesDisplayAll() { // ########## SHOW ALL PRESET BUTTON
                 <label class="tooltip" for="show-all-preset-buttons" data-tooltip="Enable to display all preset banks on screen.">Show All Preset Buttons</label>
             `;
             
-            // Insert new element after second 'form-group checkbox'
-            const secondCheckbox = checkboxes[1];
-            secondCheckbox.insertAdjacentElement('afterend', newDiv);
+            // Insert new element after last
+            const lastCheckbox = checkboxes[checkboxes.length - 1];
+            lastCheckbox.insertAdjacentElement('afterend', newDiv);
         } else {
             console.warn('There are less than two elements with class "form-group checkbox".');
         }
@@ -939,6 +939,7 @@ function AdditionalCheckboxesDisplayAll() { // ########## SHOW ALL PRESET BUTTON
           updateButtons();
           console.log("buttonPresetsDisplayAll = true");
         }
+        checkImageErrors();
     }
 
     // Create a MutationObserver instance
@@ -980,7 +981,7 @@ function AdditionalCheckboxesButtonPresets() {
     const checkboxes = document.querySelectorAll('.modal-panel-content .form-group.checkbox');
     
     // Check if there are at least two such elements
-    if (checkboxes.length >= 2) {
+    if (checkboxes.length > 0) {
       // Create new HTML element
       const newDiv = document.createElement('div');
       newDiv.className = 'form-group checkbox';
@@ -989,9 +990,9 @@ function AdditionalCheckboxesButtonPresets() {
                 <label class="tooltip" for="hide-preset-buttons" data-tooltip="Enable if you do not want to use the preset buttons.">Hide Preset Buttons</label>
             `;
       
-      // Insert new element after second 'form-group checkbox'
-      const secondCheckbox = checkboxes[1];
-      secondCheckbox.insertAdjacentElement('afterend', newDiv);
+      // Insert new element after last
+      const lastCheckbox = checkboxes[checkboxes.length - 1];
+      lastCheckbox.insertAdjacentElement('afterend', newDiv);
     } else {
       console.warn('There are less than two elements with class "form-group checkbox".');
     }
