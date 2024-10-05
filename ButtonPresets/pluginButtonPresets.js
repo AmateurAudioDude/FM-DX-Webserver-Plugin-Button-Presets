@@ -1,7 +1,9 @@
 /*
-    Button Presets v1.2.5 by AAD
+    Button Presets v1.2.6 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
+
+(() => {
 
 //////////////////////////////////////////////////
 
@@ -13,6 +15,7 @@ const bankMenuBorderLeftRadius = true; // true, false
 const bankMenuBorderRightRadius = true; // true, false
 const bankMenuCustomWidth = 'default'; // default, value in px or %
 const bankName = 'Bank'; // dropdown menu name
+const bankQuantity = 3; // total number of banks ranging from 3-8
 const optionHidePresetButtons = false; // true, false
 const optionHideDisplayAll = true; // true, false
 const displayDefaultLogo = true; // true, false
@@ -209,7 +212,7 @@ styleButtonPresets.innerHTML = `
   }
 }
 
-/* 30 button display */
+/* 30+ button display */
 #plugin-button-presets.button-presets {
   display: flex;
   flex-wrap: wrap;
@@ -218,7 +221,7 @@ styleButtonPresets.innerHTML = `
 // Append the style to the head of the document
 document.head.appendChild(styleButtonPresets);
 
-// 30 button display
+// 30+ button display
 function bankDisplayAllGap() {
   if (bankDisplayAll) {
       const styleElement = document.createElement('style');
@@ -297,7 +300,13 @@ dropdownContainer.appendChild(dropdownInput);
 var dropdownOptions = document.createElement('ul');
 dropdownOptions.classList.add('options', 'open-top');
 dropdownOptions.tabIndex = -1;
-['A', 'B', 'C'].forEach(bank => {
+var bankNames;
+if (bankQuantity >= 3 && bankQuantity <= 8) {
+  bankNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].slice(0, bankQuantity);
+} else {
+  bankNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].slice(0, 3);
+}
+bankNames.forEach(bank => {
   var option = document.createElement('li');
   option.classList.add('option');
   option.dataset.value = bank;
@@ -392,30 +401,22 @@ function updateButtonsDelayed() {
 // Update buttons based on the selected bank
 function updateButtons() {
   buttonContainer.innerHTML = ''; // Clear existing buttons
-  // 30 button display
+  // 30+ button display
   let buttonRows = 1;
 
   if (bankDisplayAll) {
-    buttonRows = 3;
+    buttonRows = bankQuantity || 3;
   } else {
     buttonRows = 1;
   }
 
   for (let iAll = 0; iAll < buttonRows; iAll++) {
-    // 30 button display
+    // 30+ button display
     if (bankDisplayAll) {
-      switch (iAll) {
-        case 0:
-          currentBank = 'A';
-          break;
-        case 1:
-          currentBank = 'B';
-          break;
-        case 2:
-          currentBank = 'C';
-          break;
-        default:
-          break;
+      if (iAll >= 0 && iAll < bankQuantity) {
+        currentBank = bankNames[iAll];
+      } else {
+        currentBank = '';
       }
     }
 
@@ -672,20 +673,12 @@ function updateButtons() {
           }
           
           button.setAttribute('data-tooltip', tooltipValue.trim());
-          // 30 button display
+          // 30+ button display
           if (bankDisplayAll) {
-            switch (iAll) {
-              case 0:
-                currentBank = 'A';
-                break;
-              case 1:
-                currentBank = 'B';
-                break;
-              case 2:
-                currentBank = 'C';
-                break;
-              default:
-                break;
+            if (iAll >= 0 && iAll < bankQuantity) {
+              currentBank = bankNames[iAll];
+            } else {
+              currentBank = '';
             }
           }
           saveToLocalStorage(currentBank, buttonValues, psValues, buttonImages, tooltipValues);
@@ -1060,7 +1053,7 @@ function executeInfoCode() {
   infoIcon.addEventListener('click', function() {
     if (typeof pluginThemedPopup !== 'undefined') {
       alert(`<strong>PRESET BUTTONS</strong>
-            <i>This feature allows you to store up to 30 presets, with 10 presets per bank.
+            <i>This feature allows you to store up to ${bankQuantity * 10} presets, with 10 presets per bank.
             To store a frequency:</i>
 
             <strong><i>Left-click</i></strong> or <strong><i>ENTER</i></strong> to recall the preset.
@@ -1073,7 +1066,7 @@ function executeInfoCode() {
             `, 'Close');
     } else {
       alertButtonPresets(`<strong>PRESET BUTTONS</strong>
-            <i>This feature allows you to store up to 30 presets, with 10 presets per bank.
+            <i>This feature allows you to store up to ${bankQuantity * 10} presets, with 10 presets per bank.
             To store a frequency:</i>
 
             <strong><i>Left-click</i></strong> or <strong><i>ENTER</i></strong> to recall the preset.
@@ -1145,11 +1138,14 @@ checkImageErrors();
 
 // Export presets to file
 function exportLocalStorageToFile() {
-  const data = {
-    buttonPresetsA: localStorage.getItem('buttonPresetsA'),
-    buttonPresetsB: localStorage.getItem('buttonPresetsB'),
-    buttonPresetsC: localStorage.getItem('buttonPresetsC'),
-  };
+  const data = {};
+  bankNames.forEach(bank => {
+    const key = `buttonPresets${bank}`;
+    const value = localStorage.getItem(key);
+    if (value !== null) { // Check if bank exists in localStorage
+      data[key] = value;
+    }
+  });
 
   const jsonData = JSON.stringify(data, null, 2);
   const blob = new Blob([jsonData], { type: 'application/json' });
@@ -1194,23 +1190,30 @@ function importLocalStorageFromFile(file) {
     try {
       const data = JSON.parse(event.target.result);
 
-      if (data.buttonPresetsA) localStorage.setItem('buttonPresetsA', data.buttonPresetsA);
-      if (data.buttonPresetsB) localStorage.setItem('buttonPresetsB', data.buttonPresetsB);
-      if (data.buttonPresetsC) localStorage.setItem('buttonPresetsC', data.buttonPresetsC);
-      
+      bankNames.forEach(bank => {
+        const key = `buttonPresets${bank}`;
+        if (data[key]) {
+          localStorage.setItem(key, data[key]);
+        }
+      });
+
       updateButtons();
-      
+
       setTimeout(() => {
-          createImportExportButtons();
+        createImportExportButtons();
       }, 100);
-      
+
       checkImageErrors();
-      
-      if (typeof sendToast === 'function') { sendToast('success', 'Preset Buttons Import', 'Preset data successfully imported.', false, false); }
-      console.log('Button Preset LocalStorage updated successfully');
+
+      if (typeof sendToast === 'function') {
+        sendToast('success', 'Preset Buttons Import', 'Preset data successfully imported.', false, false);
+      }
+      console.log('Button Preset localStorage updated successfully');
     } catch (e) {
-      if (typeof sendToast === 'function') { sendToast('error', 'Preset Buttons Import', 'Error importing preset data.', false, false); }
-      console.error('Unable to import localStorage preset data');
+      if (typeof sendToast === 'function') {
+        sendToast('error', 'Preset Buttons Import', 'Error importing preset data.', false, false);
+      }
+      console.error('Unable to import localStorage preset data', e);
     }
   };
 
@@ -1297,7 +1300,7 @@ function createImportExportButtons() {
 createImportExportButtons();
 
 /*
-    Themed Popups v1.1.0 by AAD
+    Themed Popups v1.1.1 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Themed-Popups
 */
 
@@ -1401,8 +1404,18 @@ function closePopup(event) {
 
 // Event listener for ESC key to close popup
 document.addEventListener('keydown', function(event) {
-    if ((event.key === 'Escape' || event.key === 'Enter') && popupOpened) {
+    if (popupOpened && (event.key === 'Escape' || event.key === 'Enter')) {
         closePopup(event);
         blurBackground(false);
     }
 });
+
+// Event listener for clicks outside the popup to close it
+document.addEventListener('click', function(event) {
+    if (popupOpened && !popup.contains(event.target)) {
+        closePopup(event);
+        blurBackground(false);
+    }
+});
+
+})();
