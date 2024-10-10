@@ -443,7 +443,6 @@ function updateButtons() {
           const presetInput = buttonValues[index];
           
           if (socket.readyState === WebSocket.OPEN) {
-            // "tuneTo(presetInput);" causes rounding error
             socket.send("T" + (Math.round((presetInput).toFixed(3) * 1000)));
           }
           checkBankASum();
