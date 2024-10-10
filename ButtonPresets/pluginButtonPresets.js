@@ -444,7 +444,7 @@ function updateButtons() {
           
           if (socket.readyState === WebSocket.OPEN) {
             // "tuneTo(presetInput);" causes rounding error
-            socket.send("T" + ((presetInput).toFixed(3) * 1000));
+            socket.send("T" + (Math.round((presetInput).toFixed(3) * 1000)));
           }
           checkBankASum();
         });
