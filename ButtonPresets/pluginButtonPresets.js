@@ -1,5 +1,5 @@
 /*
-    Button Presets v1.2.6 by AAD
+    Button Presets v1.2.7 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -244,6 +244,7 @@ function bankDisplayAllGap() {
 
 var tooltipFirstLoad = false;
 const DISPLAY_KEY_ButtonPresets = 'buttonPresetsHidden';
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
 // Create a container for the buttons
 var buttonContainer = document.createElement("div");
@@ -438,34 +439,97 @@ function updateButtons() {
         
         updateButton(button, buttonValues[index], index);
         
-        button.addEventListener('click', function() {
-          var commandInput = document.getElementById('commandinput');
-          const presetInput = buttonValues[index];
+        if (!isIOS) {
+          // Default button handling
+          button.addEventListener('click', function() {
+            var commandInput = document.getElementById('commandinput');
+            const presetInput = buttonValues[index];
+            
+            if (socket.readyState === WebSocket.OPEN) {
+              socket.send("T" + (Math.round((presetInput).toFixed(3) * 1000)));
+            }
+            checkBankASum();
+          });
           
-          if (socket.readyState === WebSocket.OPEN) {
-            socket.send("T" + (Math.round((presetInput).toFixed(3) * 1000)));
+          button.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            var dataFrequencyElement = document.getElementById('data-frequency');
+            var dataPsElement = document.getElementById('data-ps');
+            var dataStationNameElement = document.getElementById('data-station-name');
+            var dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
+            var dataPs = dataPsElement ? dataPsElement.textContent : '';
+            var tooltipValue = (dataStationNameElement && dataStationNameElement.offsetParent !== null) ? dataStationNameElement.textContent : dataPs;
+            
+            buttonValues[index] = parseFloat(dataFrequency) || 87.5;
+            psValues[index] = dataPs;
+            tooltipValues[index] = tooltipValue;
+            buttonImages[index] = getImageSrc();
+            updateButton(button, buttonValues[index], index);
+            checkBankASum();
+            if (typeof sendToast === 'function') { sendToast('info', 'Preset Buttons', `Frequency <strong>${buttonValues[index]} MHz</strong> saved to preset bank <b>${currentBank}</b>, button <b>#${(index + 1)}</b>.`, false, false); }
+            console.log("Preset saved:", buttonValues[index], currentBank, (index + 1));
+          });
+        } else {
+          // iOS button handling
+          let longPressTimer;
+          const LONG_PRESS_THRESHOLD = 500; // Long press functionality
+          
+          button.addEventListener('mousedown', function(e) {
+              e.preventDefault();
+              longPressTimer = setTimeout(() => {
+                  savePreset();
+              }, LONG_PRESS_THRESHOLD);
+          });
+          
+          button.addEventListener('mouseup', function(e) {
+              clearTimeout(longPressTimer);
+              if (!e.defaultPrevented) {
+                  recallPreset();
+              }
+          });
+          
+          button.addEventListener('touchstart', function(e) {
+              e.preventDefault();
+              longPressTimer = setTimeout(() => {
+                  savePreset();
+              }, LONG_PRESS_THRESHOLD);
+          });
+          
+          button.addEventListener('touchend', function(e) {
+              clearTimeout(longPressTimer);
+              if (!e.defaultPrevented) {
+                  recallPreset();
+              }
+          });
+          
+          function savePreset() {
+            var dataFrequencyElement = document.getElementById('data-frequency');
+            var dataPsElement = document.getElementById('data-ps');
+            var dataStationNameElement = document.getElementById('data-station-name');
+            var dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
+            var dataPs = dataPsElement ? dataPsElement.textContent : '';
+            var tooltipValue = (dataStationNameElement && dataStationNameElement.offsetParent !== null) ? dataStationNameElement.textContent : dataPs;
+            
+            buttonValues[index] = parseFloat(dataFrequency) || 87.5;
+            psValues[index] = dataPs;
+            tooltipValues[index] = tooltipValue;
+            buttonImages[index] = getImageSrc();
+            updateButton(button, buttonValues[index], index);
+            checkBankASum();
+            if (typeof sendToast === 'function') { sendToast('info', 'Preset Buttons', `Frequency <strong>${buttonValues[index]} MHz</strong> saved to preset bank <b>${currentBank}</b>, button <b>#${(index + 1)}</b>.`, false, false); }
+            console.log("Preset saved:", buttonValues[index], currentBank, (index + 1));
           }
-          checkBankASum();
-        });
-        
-        button.addEventListener('contextmenu', function(e) {
-          e.preventDefault();
-          var dataFrequencyElement = document.getElementById('data-frequency');
-          var dataPsElement = document.getElementById('data-ps');
-          var dataStationNameElement = document.getElementById('data-station-name');
-          var dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
-          var dataPs = dataPsElement ? dataPsElement.textContent : '';
-          var tooltipValue = (dataStationNameElement && dataStationNameElement.offsetParent !== null) ? dataStationNameElement.textContent : dataPs;
           
-          buttonValues[index] = parseFloat(dataFrequency) || 87.5;
-          psValues[index] = dataPs;
-          tooltipValues[index] = tooltipValue;
-          buttonImages[index] = getImageSrc();
-          updateButton(button, buttonValues[index], index);
-          checkBankASum();
-          if (typeof sendToast === 'function') { sendToast('info', 'Preset Buttons', `Frequency <strong>${buttonValues[index]} MHz</strong> saved to preset bank <b>${currentBank}</b>, button <b>#${(index + 1)}</b>.`, false, false); }
-          console.log("Preset saved:", buttonValues[index], currentBank, (index + 1));
-        });
+          function recallPreset() {
+            var commandInput = document.getElementById('commandinput');
+            const presetInput = buttonValues[index];
+            
+            if (socket.readyState === WebSocket.OPEN) {
+              socket.send("T" + (Math.round((presetInput).toFixed(3) * 1000)));
+            }
+            checkBankASum();
+          }
+        }
         
         // Handle keyboard events for SHIFT + S and SHIFT + R
         document.addEventListener('keydown', function(e) {
