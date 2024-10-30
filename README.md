@@ -5,7 +5,7 @@ This plugin allows locally-stored frequency presets, displayed below general FM-
 ![button-presets](https://github.com/user-attachments/assets/999726ed-db94-456a-9f53-2620085ca518)
 
 * [Download the latest zip file](https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets/archive/refs/heads/main.zip)
-* Transfer `ButtonPresets` folder, and `pluginButtonPresets.js` to FM-DX Webserver `plugins` folder
+* Transfer `ButtonPresets` folder, and `ButtonPresets.js` to FM-DX Webserver `plugins` folder
 * Restart FM-DX Webserver if required
 * Login to Adminstrator Panel and enable plugin
 
