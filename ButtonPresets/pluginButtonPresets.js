@@ -1,5 +1,5 @@
 /*
-    Button Presets v1.2.7 by AAD
+    Button Presets v1.2.8 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -1363,14 +1363,14 @@ function createImportExportButtons() {
 createImportExportButtons();
 
 /*
-    Themed Popups v1.1.1 by AAD
+    Themed Popups v1.1.2 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Themed-Popups
 */
 
 var styleElementButtonPresets = document.createElement('style');
 var cssCodeThemedPopupsButtonPresets = `
 /* Themed Popups CSS */
-.popup {
+.popup-plugin {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -1385,15 +1385,15 @@ var cssCodeThemedPopupsButtonPresets = `
     z-index: 9999;
 }
 
-.popup-content {
+.popup-plugin-content {
     text-align: center;
 }
 
-.popup button {
+.popup-plugin button {
     margin-top: 10px;
 }
 
-.popup.open {
+.popup-plugin.open {
     opacity: .99;
 }
 `;
@@ -1407,11 +1407,11 @@ function alertButtonPresets(popupMessage, popupButton) {
     }
     if (!popupOpened) { // Check if a popup is not already open
         popup = document.createElement('div');
-        popup.classList.add('popup');
-        popup.innerHTML = `<div class="popup-content">${popupMessage.replace(/\n/g, '<br>')}<button id="popup-close">${popupButton}</button></div>`;
+        popup.classList.add('popup-plugin');
+        popup.innerHTML = `<div class="popup-plugin-content">${popupMessage.replace(/\n/g, '<br>')}<button id="popup-plugin-close">${popupButton}</button></div>`;
         document.body.appendChild(popup);
 
-        var closeButton = popup.querySelector('#popup-close');
+        var closeButton = popup.querySelector('#popup-plugin-close');
         closeButton.addEventListener('click', closePopup);
 
         popup.addEventListener('click', function(event) {
