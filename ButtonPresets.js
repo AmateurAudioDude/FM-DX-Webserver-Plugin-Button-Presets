@@ -1,7 +1,7 @@
 // Plugin configuration, this is used in the administration when plugins are loaded
 var pluginConfig = {
     name: 'Button Presets',
-    version: '1.2.8',
+    version: '1.2.9',
     author: 'AAD',
     frontEndPath: 'ButtonPresets/pluginButtonPresets.js'
 }

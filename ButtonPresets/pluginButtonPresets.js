@@ -1,5 +1,5 @@
 /*
-    Button Presets v1.2.8 by AAD
+    Button Presets v1.2.9 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -44,16 +44,16 @@ const defaultPresetData = {
 */
 
 // Initial value
-var bankDisplayAll = false;
+let bankDisplayAll = false;
 
 // Global variables for other plugins
 pluginButtonPresets = true;
 
 // Create default logo
-var defaultButtonPresetImagePath = ' data:image/png;base64,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';
+let defaultButtonPresetImagePath = ' data:image/png;base64,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';
 
 // Create a style element
-var styleButtonPresets = document.createElement('style');
+let styleButtonPresets = document.createElement('style');
 styleButtonPresets.innerHTML = `
 /* Frosted glass effect */
 #plugin-button-presets button,
@@ -66,8 +66,14 @@ styleButtonPresets.innerHTML = `
   transition: 0.3s ease background-color;
 }
 
+#plugin-button-presets button img {
+  transition: transform 0.2s ease, opacity 0.3s ease-out !important;
+  transform: scale(1);
+}
+
 #plugin-button-presets button:hover img {
-  transition: opacity 0.3s ease-out !important;
+  transition: transform 0.2s ease, opacity 0.3s ease-out !important;
+  transform: scale(1.05);
 }
 
 /* Tooltip styling */
@@ -83,16 +89,20 @@ styleButtonPresets.innerHTML = `
   bottom: 120%;
   left: 50%;
   transform: translateX(-50%);
-  padding: 6px 26px;
-  background-color: var(--color-4-transparent);
-  color: #efeffe;
+  padding: 5px 25px;
+  background-color: var(--color-3-transparent);
+  border: 2px solid var(--color-3);
+  color: var(--color-text);
   border-radius: 15px;
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s;
   pointer-events: none;
+  text-align: center;
+  font-size: 14px;
   z-index: 1;
+  
 }
 
 .tooltip-presets:hover::after {
@@ -109,15 +119,15 @@ styleButtonPresets.innerHTML = `
 /* Preserve bottom margin (panels.css:93) */
 @media only screen and (min-width: 960px) and (max-height: 860px) {
   #plugin-button-presets {
-    padding-right: 8px;
+    /* padding-right: 8px; */ /* Not needed for FM-DX Webserver v1.3.5+ */
   }
 
   /* Fix spacing when chat is enabled */
-  #wrapper-outer #wrapper .flex-container .panel-10.no-bg.m-0 {
+  .wrapper-outer #wrapper .flex-container .panel-10.no-bg.m-0 {
     padding-bottom: 0;
   }
 
-  #wrapper-outer #wrapper .flex-container .panel-10.no-bg.m-0 .panel-10.no-bg.h-100 {
+  .wrapper-outer #wrapper .flex-container .panel-10.no-bg.m-0 .panel-10.no-bg.h-100 {
     height: 80px !important;
   }
 }
@@ -242,12 +252,12 @@ function bankDisplayAllGap() {
   }
 }
 
-var tooltipFirstLoad = false;
+let tooltipFirstLoad = false;
 const DISPLAY_KEY_ButtonPresets = 'buttonPresetsHidden';
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
 // Create a container for the buttons
-var buttonContainer = document.createElement("div");
+let buttonContainer = document.createElement("div");
 buttonContainer.id = "plugin-button-presets";
 buttonContainer.classList.add('button-presets', 'flex-container', 'flex-center', 'show-phone');
 buttonContainer.style.display = "flex";
@@ -259,7 +269,7 @@ buttonContainer.style.marginRight = "6px";
 // Function to get stored button values, data-ps values, and images from localStorage
 function getStoredData(bank) {
   const key = `buttonPresets${bank}`;
-  var dataButtonPresets;
+  let dataButtonPresets;
   if (bank === "A") {
     dataButtonPresets = JSON.parse(localStorage.getItem(key)) || { values: [...defaultPresetData.values], ps: [...defaultPresetData.names], images: [...defaultPresetData.urls] };
   } else {
@@ -287,28 +297,28 @@ function saveToLocalStorage(bank, buttonValues, psValues, buttonImages, tooltipV
 let currentBank = 'A';
 
 // Create a custom dropdown menu
-var dropdownContainer = document.createElement('div');
+let dropdownContainer = document.createElement('div');
 dropdownContainer.classList.add('panel-50', 'w-50', 'no-bg', 'h-100', 'm-0', 'dropdown', 'dropdown-up', 'hide-phone');
 dropdownContainer.id = 'button-presets-bank-dropdown'; // Dropdown ID
 
-var dropdownInput = document.createElement('input');
+let dropdownInput = document.createElement('input');
 dropdownInput.type = 'text';
 dropdownInput.placeholder = `${bankName} A`; // Bank text
 dropdownInput.readOnly = true;
 dropdownInput.tabIndex = 0;
 dropdownContainer.appendChild(dropdownInput);
 
-var dropdownOptions = document.createElement('ul');
+let dropdownOptions = document.createElement('ul');
 dropdownOptions.classList.add('options', 'open-top');
 dropdownOptions.tabIndex = -1;
-var bankNames;
+let bankNames;
 if (bankQuantity >= 3 && bankQuantity <= 8) {
   bankNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].slice(0, bankQuantity);
 } else {
   bankNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].slice(0, 3);
 }
 bankNames.forEach(bank => {
-  var option = document.createElement('li');
+  let option = document.createElement('li');
   option.classList.add('option');
   option.dataset.value = bank;
   option.tabIndex = 0;
@@ -333,7 +343,7 @@ dropdownOptions.addEventListener('click', function(event) {
 });
 
 // Insert the dropdown menu before the specified element
-var targetElement;
+let targetElement;
 if (bankMenuLocation !== 'hidden' && !bankDisplayAll) {
   if (bankMenuLocation == 'ims') {
     targetElement = document.querySelector('.panel-50.no-bg.br-0.h-100.m-0.button-ims');
@@ -429,7 +439,7 @@ function updateButtons() {
 
     for (let i = 0; i < 10; i++) {
       (function(index) {
-        var button = document.createElement("button");
+        let button = document.createElement("button");
         button.id = `setFrequencyButton${index}`;
         button.classList.add('tooltip-presets', 'tooltip-presets-once');
         button.setAttribute('data-tooltip', tooltipValues[index] || psValues[index]); // Tooltip uses data-station-name if available, otherwise psValue
@@ -442,7 +452,7 @@ function updateButtons() {
         if (!isIOS) {
           // Default button handling
           button.addEventListener('click', function() {
-            var commandInput = document.getElementById('commandinput');
+            let commandInput = document.getElementById('commandinput');
             const presetInput = buttonValues[index];
             
             if (socket.readyState === WebSocket.OPEN) {
@@ -453,12 +463,12 @@ function updateButtons() {
           
           button.addEventListener('contextmenu', function(e) {
             e.preventDefault();
-            var dataFrequencyElement = document.getElementById('data-frequency');
-            var dataPsElement = document.getElementById('data-ps');
-            var dataStationNameElement = document.getElementById('data-station-name');
-            var dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
-            var dataPs = dataPsElement ? dataPsElement.textContent : '';
-            var tooltipValue = (dataStationNameElement && dataStationNameElement.offsetParent !== null) ? dataStationNameElement.textContent : dataPs;
+            let dataFrequencyElement = document.getElementById('data-frequency');
+            let dataPsElement = document.getElementById('data-ps');
+            let dataStationNameElement = document.getElementById('data-station-name');
+            let dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
+            let dataPs = dataPsElement ? dataPsElement.textContent : '';
+            let tooltipValue = (dataStationNameElement && dataStationNameElement.offsetParent !== null) ? dataStationNameElement.textContent : dataPs;
             
             buttonValues[index] = parseFloat(dataFrequency) || 87.5;
             psValues[index] = dataPs;
@@ -503,12 +513,12 @@ function updateButtons() {
           });
           
           function savePreset() {
-            var dataFrequencyElement = document.getElementById('data-frequency');
-            var dataPsElement = document.getElementById('data-ps');
-            var dataStationNameElement = document.getElementById('data-station-name');
-            var dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
-            var dataPs = dataPsElement ? dataPsElement.textContent : '';
-            var tooltipValue = (dataStationNameElement && dataStationNameElement.offsetParent !== null) ? dataStationNameElement.textContent : dataPs;
+            let dataFrequencyElement = document.getElementById('data-frequency');
+            let dataPsElement = document.getElementById('data-ps');
+            let dataStationNameElement = document.getElementById('data-station-name');
+            let dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
+            let dataPs = dataPsElement ? dataPsElement.textContent : '';
+            let tooltipValue = (dataStationNameElement && dataStationNameElement.offsetParent !== null) ? dataStationNameElement.textContent : dataPs;
             
             buttonValues[index] = parseFloat(dataFrequency) || 87.5;
             psValues[index] = dataPs;
@@ -521,7 +531,7 @@ function updateButtons() {
           }
           
           function recallPreset() {
-            var commandInput = document.getElementById('commandinput');
+            let commandInput = document.getElementById('commandinput');
             const presetInput = buttonValues[index];
             
             if (socket.readyState === WebSocket.OPEN) {
@@ -533,15 +543,15 @@ function updateButtons() {
         
         // Handle keyboard events for SHIFT + S and SHIFT + R
         document.addEventListener('keydown', function(e) {
-          var isButtonFocused = document.activeElement === button;
+          let isButtonFocused = document.activeElement === button;
 
           if (isButtonFocused) {
             if (e.shiftKey && e.key === 'S') {
               // SHIFT + S key combination
-              var dataFrequencyElement = document.getElementById('data-frequency');
-              var dataPsElement = document.getElementById('data-ps');
-              var dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
-              var dataPs = dataPsElement ? dataPsElement.textContent : '';
+              let dataFrequencyElement = document.getElementById('data-frequency');
+              let dataPsElement = document.getElementById('data-ps');
+              let dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
+              let dataPs = dataPsElement ? dataPsElement.textContent : '';
               
               buttonValues[index] = parseFloat(dataFrequency) || 87.5;
               psValues[index] = dataPs;
@@ -570,10 +580,10 @@ function updateButtons() {
               buttonImages[index] = '';
               tooltipValues[index] = ''; // Reset the tooltip value as well
             } else if (e.ctrlKey) {
-              var dataFrequencyElement = document.getElementById('data-frequency');
-              var dataPsElement = document.getElementById('data-ps');
-              var dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
-              var dataPs = dataPsElement ? dataPsElement.textContent : '';
+              let dataFrequencyElement = document.getElementById('data-frequency');
+              let dataPsElement = document.getElementById('data-ps');
+              let dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
+              let dataPs = dataPsElement ? dataPsElement.textContent : '';
               
               buttonValues[index] = parseFloat(dataFrequency) || 87.5;
               psValues[index] = dataPs;
@@ -814,7 +824,7 @@ currentBank = 'A';
 updateButtons();
 
 // Find the container to insert the button container after
-var container = document.querySelector('#wrapper-outer #wrapper .flex-container');
+const container = document.querySelector('.wrapper-outer #wrapper .flex-container') || document.querySelector('#wrapper-outer #wrapper .flex-container');
 
 // Insert the button container after the container
 if (document.getElementById('rt-container')) {
@@ -830,19 +840,19 @@ function toggleButtonContainer(statusToast) {
       sendToast('info', 'Preset Buttons', 'Preset Buttons hidden.', false, false);
       console.log('Button Preset plugin hidden');
     }
-    var element = document.getElementById('plugin-button-presets');
+    let element = document.getElementById('plugin-button-presets');
     element.style.setProperty('display', 'none');
     document.getElementById('button-presets-bank-dropdown').style.display = 'none';
-    var infoIconContainer = document.getElementById('button-presets-info-icon-container');
+    let infoIconContainer = document.getElementById('button-presets-info-icon-container');
     
     if (infoIconContainer) {
       infoIconContainer.style.display = 'none';
 
-      var styleButtonPresetsHide = document.createElement('style');
+      let styleButtonPresetsHide = document.createElement('style');
       styleButtonPresetsHide.innerHTML = `
         /* Preserve bottom margin (panels.css:93) */
         @media only screen and (min-width: 960px) and (max-height: 860px) {
-            #wrapper-outer #wrapper .flex-container .panel-10.no-bg.m-0 .panel-10.no-bg.h-100 {
+            .wrapper-outer #wrapper .flex-container .panel-10.no-bg.m-0 .panel-10.no-bg.h-100 {
                 height: 120px !important;
             }
         }
@@ -856,25 +866,25 @@ function toggleButtonContainer(statusToast) {
       sendToast('info', 'Preset Buttons', 'Preset Buttons restored.', false, false);
       console.log('Button Preset plugin restored');
     }
-    var element = document.getElementById('plugin-button-presets');
+    let element = document.getElementById('plugin-button-presets');
     element.style.setProperty('display', 'flex');
     
     if (window.innerWidth >= 768) {
-      var dropdown = document.getElementById('button-presets-bank-dropdown');
+      let dropdown = document.getElementById('button-presets-bank-dropdown');
       if (dropdown) {
         dropdown.style.display = 'block';
       }
     }
     
-    var infoIconContainer = document.getElementById('button-presets-info-icon-container');
+    let infoIconContainer = document.getElementById('button-presets-info-icon-container');
     if (infoIconContainer) {
       infoIconContainer.style.display = 'flex';
 
-      var styleButtonPresetsHide = document.createElement('style');
+      let styleButtonPresetsHide = document.createElement('style');
       styleButtonPresetsHide.innerHTML = `
         /* Preserve bottom margin (panels.css:93) */
         @media only screen and (min-width: 960px) and (max-height: 860px) {
-            #wrapper-outer #wrapper .flex-container .panel-10.no-bg.m-0 .panel-10.no-bg.h-100 {
+            .wrapper-outer #wrapper .flex-container .panel-10.no-bg.m-0 .panel-10.no-bg.h-100 {
                 height: 80px !important;
             }
         }
@@ -888,20 +898,21 @@ function toggleButtonContainer(statusToast) {
 
 // Initial tooltip
 function oncePresetTooltips() {
+  let tooltipText;
   $('.tooltip-presets-once').hover(function(e) {
     // Never display again after first click
     if (tooltipFirstLoad == true) { return; } else { tooltipFirstLoad = true; }
     $(document).on('mousedown', () => { clearTimeout($(this).data('timeout')); return; });
     if (!document.querySelector('.tooltip-presets-once')) { return; }
     if (!/Mobi|Android|iPhone|iPad|iPod|Opera Mini/i.test(navigator.userAgent)) {
-      var tooltipText = `
+      tooltipText = `
             <strong><i>Left-click</i></strong> or <strong><i>ENTER</i></strong> to recall the preset.<br>
             <strong><i>Right-click</i></strong>, <strong><i>CTRL+click</i></strong>, or <strong><i>SHIFT+S</i></strong> to store the preset.<br>
             <strong><i>Middle-click</i></strong> or <strong><i>SHIFT+click</i></strong>, or <strong><i>SHIFT+R</i></strong> to reset the preset.<br>
             <strong>Stored presets do not affect other browsers.</strong>
             `;
     } else {
-      var tooltipText = `
+      tooltipText = `
             Tap to recall the preset.<br>
             Long press to store the preset.<br>
             <strong>Stored presets do not affect other browsers.</strong>
@@ -909,14 +920,14 @@ function oncePresetTooltips() {
     }
     // Add a delay of 500 milliseconds before creating and appending the tooltip
     $(this).data('timeout', setTimeout(() => {
-      var tooltip = $('<div class="tooltiptext"></div>').html(tooltipText);
+      let tooltip = $('<div class="tooltiptext"></div>').html(tooltipText);
       $('body').append(tooltip);
       
-      var posX = e.pageX;
-      var posY = e.pageY;
+      let posX = e.pageX;
+      let posY = e.pageY;
       
-      var tooltipWidth = tooltip.outerWidth();
-      var tooltipHeight = tooltip.outerHeight();
+      let tooltipWidth = tooltip.outerWidth();
+      let tooltipHeight = tooltip.outerHeight();
       posX -= tooltipWidth / 2;
       posY -= tooltipHeight + 10;
       tooltip.css({ top: posY, left: posX, opacity: .99 }); // Set opacity to 1
@@ -931,10 +942,10 @@ function oncePresetTooltips() {
     clearTimeout($(this).data('timeout'));
     $('.tooltiptext').remove();
   }).mousemove(function(e) {
-    var tooltipWidth = $('.tooltiptext').outerWidth();
-    var tooltipHeight = $('.tooltiptext').outerHeight();
-    var posX = e.pageX - tooltipWidth / 2;
-    var posY = e.pageY - tooltipHeight - 10;
+    let tooltipWidth = $('.tooltiptext').outerWidth();
+    let tooltipHeight = $('.tooltiptext').outerHeight();
+    let posX = e.pageX - tooltipWidth / 2;
+    let posY = e.pageY - tooltipHeight - 10;
     
     $('.tooltiptext').css({ top: posY, left: posX });
   });
@@ -968,13 +979,13 @@ function AdditionalCheckboxesDisplayAll() { // ########## SHOW ALL PRESET BUTTON
     }
     insertHtmlAfterSecondCheckbox();
 
-    var isDisplayAll = localStorage.getItem("buttonPresetsDisplayAll");
+    let isDisplayAll = localStorage.getItem("buttonPresetsDisplayAll");
     if (isDisplayAll === "true") {
         $("#show-all-preset-buttons").prop("checked", true);
     }
 
     $("#show-all-preset-buttons").change(function() {
-        var isChecked = $(this).is(":checked");
+        let isChecked = $(this).is(":checked");
         localStorage.setItem("buttonPresetsDisplayAll", isChecked);
         setDisplayAll();
     });
@@ -1055,13 +1066,13 @@ function AdditionalCheckboxesButtonPresets() {
   }
   insertHtmlAfterSecondCheckbox();
   
-  var isButtonPresetsHidden = localStorage.getItem(DISPLAY_KEY_ButtonPresets);
+  let isButtonPresetsHidden = localStorage.getItem(DISPLAY_KEY_ButtonPresets);
   if (isButtonPresetsHidden === "true") {
     $("#hide-preset-buttons").prop("checked", true);
   }
   
   $("#hide-preset-buttons").change(function() {
-    var isChecked = $(this).is(":checked");
+    let isChecked = $(this).is(":checked");
     localStorage.setItem(DISPLAY_KEY_ButtonPresets, isChecked);
     toggleButtonContainer(true);
   });
@@ -1095,7 +1106,7 @@ function checkBankASum() {
 // Function to execute when the sum is 875
 function executeInfoCode() {
   // Create a new div for the info icon
-  var infoIconContainer = document.createElement('div');
+  let infoIconContainer = document.createElement('div');
   infoIconContainer.id = 'button-presets-info-icon-container'; // Assign an ID for later use
   infoIconContainer.style.position = 'absolute';
   infoIconContainer.style.bottom = '60px';
@@ -1106,7 +1117,7 @@ function executeInfoCode() {
   infoIconContainer.style.imageRendering = 'auto';
   
   // Create the FontAwesome info icon
-  var infoIcon = document.createElement('i');
+  let infoIcon = document.createElement('i');
   infoIcon.id = 'info-icon'; // Assign an ID to the icon itself
   infoIcon.classList.add('fa-solid', 'fa-circle-question');
   infoIcon.style.fontSize = '20px';
@@ -1150,7 +1161,7 @@ function executeInfoCode() {
 
 // Function to hide the info icon
 function hideInfoIcon() {
-  var infoIconContainer = document.getElementById('button-presets-info-icon-container');
+  let infoIconContainer = document.getElementById('button-presets-info-icon-container');
   if (infoIconContainer) {
     infoIconContainer.style.display = 'none';
   }
@@ -1158,7 +1169,7 @@ function hideInfoIcon() {
 
 // Function to show the info icon
 function showInfoIcon() {
-  var infoIconContainer = document.getElementById('button-presets-info-icon-container');
+  let infoIconContainer = document.getElementById('button-presets-info-icon-container');
   if (infoIconContainer) {
     infoIconContainer.style.display = 'flex';
   }
@@ -1367,8 +1378,8 @@ createImportExportButtons();
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Themed-Popups
 */
 
-var styleElementButtonPresets = document.createElement('style');
-var cssCodeThemedPopupsButtonPresets = `
+let styleElementButtonPresets = document.createElement('style');
+let cssCodeThemedPopupsButtonPresets = `
 /* Themed Popups CSS */
 .popup-plugin {
     position: fixed;
@@ -1411,7 +1422,7 @@ function alertButtonPresets(popupMessage, popupButton) {
         popup.innerHTML = `<div class="popup-plugin-content">${popupMessage.replace(/\n/g, '<br>')}<button id="popup-plugin-close">${popupButton}</button></div>`;
         document.body.appendChild(popup);
 
-        var closeButton = popup.querySelector('#popup-plugin-close');
+        let closeButton = popup.querySelector('#popup-plugin-close');
         closeButton.addEventListener('click', closePopup);
 
         popup.addEventListener('click', function(event) {
@@ -1448,11 +1459,11 @@ function blurBackground(status) {
 }
 
 // Global variables for popup state
-var popupOpened = false;
-var popup;
+let popupOpened = false;
+let popup;
 
-var popupPromptOpened = false;
-var idModal = document.getElementById('myModal');
+let popupPromptOpened = false;
+let idModal = document.getElementById('myModal');
 
 // Function to close the popup
 function closePopup(event) {
