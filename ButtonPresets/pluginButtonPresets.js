@@ -1314,7 +1314,7 @@ function createImportExportButtons() {
   exportButton.style.cursor = 'pointer';
   exportButton.style.position = 'absolute';
   exportButton.style.transform = 'scale(0.8)';
-  exportButton.style.right = window.innerHeight > 860 ? '-10px' : '-2px';
+  exportButton.style.right = window.innerHeight > 720 ? '-10px' : '-2px';
   exportButton.style.bottom = '26px';
   if (!/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     exportButton.style.marginRight = '0';
@@ -1334,7 +1334,7 @@ function createImportExportButtons() {
   importButton.style.cursor = 'pointer';
   importButton.style.position = 'absolute';
   importButton.style.transform = 'scale(0.8)';
-  importButton.style.right = window.innerHeight > 860 ? '-10px' : '-2px';
+  importButton.style.right = window.innerHeight > 720 ? '-10px' : '-2px';
   importButton.style.bottom = '10px';
   if (!/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     importButton.style.marginRight = '0';
