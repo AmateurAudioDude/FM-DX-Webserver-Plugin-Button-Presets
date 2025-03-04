@@ -13,6 +13,10 @@ This plugin allows locally-stored frequency presets, displayed below general FM-
 
 ![popup](https://github.com/user-attachments/assets/ad910fdb-ae7d-4b4c-aea4-9e6acfd13b56)
 
+v1.3.0
+------
+* Added option to place bank selection buttons inside dashboard panel
+
 v1.2.9
 ------
 * Fix for FM-DX Webserver v1.3.5 compatibility issues
