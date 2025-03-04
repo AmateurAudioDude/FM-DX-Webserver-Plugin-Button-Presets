@@ -1,5 +1,5 @@
 /*
-    Button Presets v1.2.9 by AAD
+    Button Presets v1.3.0 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -7,7 +7,7 @@
 
 //////////////////////////////////////////////////
 
-const bankMenuLocation = 'ims' // ims, bw, ant, eq, hidden
+const bankMenuLocation = 'ims' // ims, bw, ant, eq, top, top-replace, hidden
 const bankMenuPosition = 'after' // before, after
 const bankMenuPaddingLeft = '15' // value in px
 const bankMenuPaddingRight = '0' // value in px
@@ -15,7 +15,7 @@ const bankMenuBorderLeftRadius = true; // true, false
 const bankMenuBorderRightRadius = true; // true, false
 const bankMenuCustomWidth = 'default'; // default, value in px or %
 const bankName = 'Bank'; // dropdown menu name
-const bankQuantity = 3; // total number of banks ranging from 3-8
+const bankQuantity = 4; // total number of banks ranging from 3-8
 const optionHidePresetButtons = false; // true, false
 const optionHideDisplayAll = true; // true, false
 const displayDefaultLogo = true; // true, false
@@ -342,6 +342,175 @@ dropdownOptions.addEventListener('click', function(event) {
   }
 });
 
+// Function to replace F1-F4 preset buttons
+function replacePresets() {
+    document.addEventListener("DOMContentLoaded", () => {
+        let replaceOriginals;
+
+        const presets = {
+            preset1: { bank: "A", label: `${bankName} A` },
+            preset2: { bank: "B", label: `${bankName} B` },
+            preset3: { bank: "C", label: `${bankName} C` },
+            preset4: { bank: "D", label: `${bankName} D` }
+        };
+
+        const extraPresets = {
+            preset5: { bank: "E", label: `${bankName} E` },
+            preset6: { bank: "F", label: `${bankName} F` },
+            preset7: { bank: "G", label: `${bankName} G` },
+            preset8: { bank: "H", label: `${bankName} H` }
+        };
+
+        if (bankMenuLocation === 'top-replace') {
+            replaceOriginals = true;
+        } else {
+            replaceOriginals = false;
+        }
+
+        // Get parent of existing buttons
+        const firstButton = document.querySelector('#dashboard-panel-description .flex-container .flex-center #preset1');
+        let originalContainer, parentNode;
+        if (firstButton) {
+            originalContainer = firstButton.parentNode;
+            parentNode = originalContainer.parentNode;
+        }
+
+        let newContainer1, newContainer2;
+        if (!replaceOriginals && originalContainer && parentNode) {
+            newContainer1 = document.createElement('div');
+            newContainer1.style.display = 'flex';
+            newContainer1.style.flexWrap = 'wrap';
+            newContainer1.style.maxWidth = originalContainer.style.width || '100%';
+            parentNode.insertBefore(newContainer1, originalContainer.nextSibling);
+
+            if (bankQuantity === 8) {
+                newContainer2 = document.createElement('div');
+                newContainer2.style.display = 'flex';
+                newContainer2.style.flexWrap = 'wrap';
+                newContainer2.style.maxWidth = originalContainer.style.width || '100%';
+                parentNode.insertBefore(newContainer2, newContainer1.nextSibling);
+            }
+        }
+
+        Object.entries(presets).forEach(([id, { bank, label }], index) => {
+            const button = document.querySelector(`#${id}.no-bg.color-4.hover-brighten`);
+
+            if (button) {
+                if (replaceOriginals) {
+                    // Style
+                    button.addEventListener("click", (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        currentBank = bank;
+                        updateButtons();
+                    }, true);
+
+                    if (bankQuantity === 8 && originalContainer && parentNode && !newContainer1) {
+                        newContainer1 = document.createElement('div');
+                        newContainer1.style.display = 'flex';
+                        newContainer1.style.flexWrap = 'wrap';
+                        newContainer1.style.maxWidth = originalContainer.style.width || '100%';
+                        parentNode.insertBefore(newContainer1, originalContainer.nextSibling);
+                    }
+
+                    if (bankQuantity === 8) {
+                        const clonedButton = button.cloneNode(true);
+                        const newId = `preset${index + 5}`;
+                        // Style
+                        clonedButton.id = newId;
+
+                        const clonedSpan = clonedButton.querySelector(`#${id}-text`);
+                        if (clonedSpan) {
+                            clonedSpan.id = `${newId}-text`;
+                            clonedSpan.textContent = extraPresets[newId].label;
+                        }
+
+                        newContainer1.appendChild(clonedButton);
+
+                        clonedButton.addEventListener("click", (event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            currentBank = extraPresets[newId].bank;
+                            updateButtons();
+                        }, true);
+                    }
+                } else {
+                    const newButton = button.cloneNode(true);
+                    const newId = `button-${id}`;
+                    // Style
+                    newButton.id = newId;
+                    newButton.style.height = '64px';
+                    newButton.style.filter = 'hue-rotate(45deg)';
+
+                    const newSpan = newButton.querySelector(`#${id}-text`);
+                    if (newSpan) {
+                        newSpan.id = `${newId}-text`;
+                        newSpan.textContent = label;
+                    }
+
+                    newContainer1.appendChild(newButton);
+
+                    newButton.addEventListener("click", (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        currentBank = bank;
+                        updateButtons();
+                    }, true);
+                }
+            }
+        });
+
+        if (!replaceOriginals && bankQuantity === 8) {
+            Object.entries(extraPresets).forEach(([id, { bank, label }], index) => {
+                const origButton = document.querySelector(`#preset${index + 1}.no-bg.color-4.hover-brighten`);
+                if (origButton) {
+                    const extraButton = origButton.cloneNode(true);
+                    // Style
+                    extraButton.id = id;
+                    extraButton.style.height = '64px';
+                    extraButton.style.filter = 'hue-rotate(45deg)';
+
+                    const extraSpan = extraButton.querySelector(`#preset${index + 1}-text`);
+                    if (extraSpan) {
+                        extraSpan.id = `${id}-text`;
+                        extraSpan.textContent = label;
+                    }
+
+                    newContainer2.appendChild(extraButton);
+
+                    extraButton.addEventListener("click", (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        currentBank = bank;
+                        updateButtons();
+                    }, true);
+                }
+            });
+        }
+
+        Object.entries(presets).forEach(([id, { label }]) => {
+            const span = document.querySelector(`#${id}-text`);
+            if (span && replaceOriginals) {
+                const observer = new MutationObserver((mutations, obs) => {
+                    mutations.forEach(mutation => {
+                        if (mutation.type === "childList" && span.textContent.trim() !== "") {
+                            span.textContent = label;
+                            obs.disconnect();
+                        }
+                    });
+                });
+
+                observer.observe(span, { childList: true, subtree: true });
+
+                if (span.textContent.trim() !== "") {
+                    span.textContent = label;
+                    observer.disconnect();
+                }
+            }
+        });
+    });
+}
+
 // Insert the dropdown menu before the specified element
 let targetElement;
 if (bankMenuLocation !== 'hidden' && !bankDisplayAll) {
@@ -353,6 +522,8 @@ if (bankMenuLocation !== 'hidden' && !bankDisplayAll) {
     targetElement = document.querySelector('#data-ant.panel-50');
   } else if (bankMenuLocation == 'eq') {
     targetElement = document.querySelector('.panel-50.no-bg.br-0.h-100.m-0.button-eq');
+  } else if (bankMenuLocation == 'top' || bankMenuLocation == 'top-replace') {
+    replacePresets();
   }
 }
 
