@@ -227,6 +227,22 @@ styleButtonPresets.innerHTML = `
   display: flex;
   flex-wrap: wrap;
 }
+
+/* 2 rows of 5 buttons for low resolution */
+@media screen and (max-width: 728px) {
+    #plugin-button-presets {
+      display: grid !important;
+      padding: 0;
+      grid-template-columns: repeat(5, 16%);
+        @media screen and (max-width: 440px) {
+          padding: 0 60px 0 60px;
+          grid-template-columns: repeat(5, 1fr);
+        }
+    }
+    #plugin-button-presets.button-presets button[id^="setFrequencyButton"] {
+        width: calc(100% - 12px) !important;
+    }
+}
 `;
 // Append the style to the head of the document
 document.head.appendChild(styleButtonPresets);
