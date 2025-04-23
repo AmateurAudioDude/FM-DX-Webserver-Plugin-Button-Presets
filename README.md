@@ -1,4 +1,4 @@
-# Button Presets plugin for FM-DX Webserver
+# Preset Buttons plugin for FM-DX Webserver
 
 This plugin allows locally-stored frequency presets, displayed below general FM-DX Webserver containers.
 
@@ -12,6 +12,10 @@ This plugin allows locally-stored frequency presets, displayed below general FM-
 #### Configuration options found in `pluginButtonPresets.js`
 
 ![popup](https://github.com/user-attachments/assets/ad910fdb-ae7d-4b4c-aea4-9e6acfd13b56)
+
+v1.3.1
+------
+* Fix for FM-DX Webserver v1.3.7 compatibility issues
 
 v1.3.0
 ------
