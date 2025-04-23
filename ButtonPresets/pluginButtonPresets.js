@@ -1,5 +1,5 @@
 /*
-    Button Presets v1.3.0 by AAD
+    Preset Buttons v1.3.1 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -1145,16 +1145,19 @@ function AdditionalCheckboxesDisplayAll() { // ########## SHOW ALL PRESET BUTTON
     // Insert HTML after second element with class 'form-group checkbox'
     function insertHtmlAfterSecondCheckbox() {
         // Select all elements with class 'form-group checkbox'
-        const checkboxes = document.querySelectorAll('.modal-panel-content .form-group.checkbox');
+        const checkboxes = document.querySelectorAll('.modal-panel-content .form-group');
         
         // Check if there are at least two such elements
         if (checkboxes.length > 0) {
             // Create new HTML element
             const newDiv = document.createElement('div');
-            newDiv.className = 'form-group checkbox';
+            newDiv.className = 'form-group';
             newDiv.innerHTML = `
-                <input type="checkbox" tabindex="0" id="show-all-preset-buttons" aria-label="Show all preset buttons">
-                <label for="show-all-preset-buttons" class="tooltip" data-tooltip="Enable to display all preset banks on screen."><i class="fa-solid fa-toggle-off m-right-10"></i> Show All Presets</label>
+                <div class="switch flex-container flex-phone flex-phone-column flex-phone-center">
+                    <input type="checkbox" tabindex="0" id="show-all-preset-buttons" aria-label="Show all preset buttons">
+                    <label for="show-all-preset-buttons" class="tooltip" data-tooltip="Enable to display all preset banks on screen."></label>
+                    <span class="text-smaller text-uppercase text-bold color-4 p-10">Show All Presets</span>
+                </div>
             `;
             
             // Insert new element after last
@@ -1232,16 +1235,19 @@ function AdditionalCheckboxesButtonPresets() {
   // Insert HTML after second element with class 'form-group checkbox'
   function insertHtmlAfterSecondCheckbox() {
     // Select all elements with class 'form-group checkbox'
-    const checkboxes = document.querySelectorAll('.modal-panel-content .form-group.checkbox');
+    const checkboxes = document.querySelectorAll('.modal-panel-content .form-group');
     
     // Check if there are at least two such elements
     if (checkboxes.length > 0) {
       // Create new HTML element
       const newDiv = document.createElement('div');
-      newDiv.className = 'form-group checkbox';
+      newDiv.className = 'form-group';
       newDiv.innerHTML = `
-                <input type="checkbox" tabindex="0" id="hide-preset-buttons" aria-label="Hide preset buttons">
-                <label for="hide-preset-buttons" class="tooltip" data-tooltip="Enable if you do not want to use the preset buttons."><i class="fa-solid fa-toggle-off m-right-10"></i> Hide Preset Buttons</label>
+                <div class="switch flex-container flex-phone flex-phone-column flex-phone-center">
+                    <input type="checkbox" tabindex="0" id="hide-preset-buttons" aria-label="Hide preset buttons">
+                    <label for="hide-preset-buttons" class="tooltip" data-tooltip="Enable if you do not want to use the preset buttons."></label>
+                    <span class="text-smaller text-uppercase text-bold color-4 p-10">Hide Preset Buttons</span>
+                </div>
             `;
       
       // Insert new element after last
