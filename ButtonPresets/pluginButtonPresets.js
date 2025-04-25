@@ -1029,7 +1029,8 @@ function toggleButtonContainer(statusToast) {
     }
     let element = document.getElementById('plugin-button-presets');
     element.style.setProperty('display', 'none');
-    document.getElementById('button-presets-bank-dropdown').style.display = 'none';
+    const buttonPresetsBankDropdown = document.getElementById('button-presets-bank-dropdown');
+    if (buttonPresetsBankDropdown) buttonPresetsBankDropdown.style.display = 'none';
     let infoIconContainer = document.getElementById('button-presets-info-icon-container');
     
     if (infoIconContainer) {
@@ -1192,7 +1193,8 @@ function AdditionalCheckboxesDisplayAll() { // ########## SHOW ALL PRESET BUTTON
           bankDisplayAll = true;
           bankDisplayAllGap();
           toggleButtonContainer();
-          document.getElementById('button-presets-bank-dropdown').style.display = 'none';
+          const buttonPresetsBankDropdown = document.getElementById('button-presets-bank-dropdown');
+          if (buttonPresetsBankDropdown) buttonPresetsBankDropdown.style.display = 'none';
           updateButtons();
           console.log("buttonPresetsDisplayAll = true");
         }
