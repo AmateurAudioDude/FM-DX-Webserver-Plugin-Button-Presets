@@ -43,6 +43,13 @@ const defaultPresetData = {
 
 */
 
+const pluginVersion = '1.3.1';
+const pluginName = "Preset Buttons";
+const pluginHomepageUrl = "https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets";
+const pluginUpdateUrl = "https://raw.githubusercontent.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets/refs/heads/main/ButtonPresets/pluginButtonPresets.js";
+const pluginSetupOnlyNotify = true;
+const CHECK_FOR_UPDATES = true;
+
 // Initial value
 let bankDisplayAll = false;
 
@@ -920,7 +927,7 @@ function updateButtons() {
             textElement.style.position = "relative";
             textElement.style.color = "var(--color-text)";
             textElement.style.textShadow = '2px 2px 4px rgba(0, 0, 0, 0.8)';
-            textElement.style.fontFamily = window.getComputedStyle(document.getElementById('data-ps')).fontFamily;
+            if (window.location.pathname !== '/setup') textElement.style.fontFamily = window.getComputedStyle(document.getElementById('data-ps')).fontFamily;
             button.appendChild(textElement);
             
             // Add hover effect for buttons without an image
@@ -1055,7 +1062,7 @@ function toggleButtonContainer(statusToast) {
       console.log('Button Preset plugin restored');
     }
     let element = document.getElementById('plugin-button-presets');
-    element.style.setProperty('display', 'flex');
+    if (window.location.pathname !== '/setup') element.style.setProperty('display', 'flex');
     
     if (window.innerWidth >= 768) {
       let dropdown = document.getElementById('button-presets-bank-dropdown');
@@ -1351,7 +1358,7 @@ function executeInfoCode() {
   
   // Append the icon to the container and the container to the body
   infoIconContainer.appendChild(infoIcon);
-  document.body.appendChild(infoIconContainer);
+  if (window.location.pathname !== '/setup') document.body.appendChild(infoIconContainer);
 }
 
 // Function to hide the info icon
@@ -1686,5 +1693,91 @@ document.addEventListener('click', function(event) {
         blurBackground(false);
     }
 });
+
+// Function for update notification in /setup
+function checkUpdate(setupOnly, pluginVersion, pluginName, urlUpdateLink, urlFetchLink) {
+    if (setupOnly && window.location.pathname !== '/setup') return;
+
+    // Function to check for updates
+    async function fetchFirstLine() {
+        const urlCheckForUpdate = urlFetchLink;
+
+        try {
+            const response = await fetch(urlCheckForUpdate);
+            if (!response.ok) {
+                throw new Error(`[${pluginName}] update check HTTP error! status: ${response.status}`);
+            }
+
+            const text = await response.text();
+            const lines = text.split('\n');
+
+            let version;
+
+            if (lines.length > 2) {
+                const versionLine = lines.find(line => line.includes("const pluginVersion =") || line.includes("const plugin_version ="));
+                if (versionLine) {
+                    const match = versionLine.match(/const\s+plugin[_vV]ersion\s*=\s*['"]([^'"]+)['"]/);
+                    if (match) {
+                        version = match[1];
+                    }
+                }
+            }
+
+            if (!version) {
+                const firstLine = lines[0].trim();
+                version = /^\d/.test(firstLine) ? firstLine : "Unknown"; // Check if first character is a number
+            }
+
+            return version;
+        } catch (error) {
+            console.error(`[${pluginName}] error fetching file:`, error);
+            return null;
+        }
+    }
+
+    // Check for updates
+    fetchFirstLine().then(newVersion => {
+        if (newVersion) {
+            if (newVersion !== pluginVersion) {
+                let updateConsoleText = "There is a new version of this plugin available";
+                // Any custom code here
+                
+                console.log(`[${pluginName}] ${updateConsoleText}`);
+                setupNotify(pluginVersion, newVersion, pluginName, urlUpdateLink);
+            }
+        }
+    });
+
+    function setupNotify(pluginVersion, newVersion, pluginName, urlUpdateLink) {
+        if (window.location.pathname === '/setup') {
+          const pluginSettings = document.getElementById('plugin-settings');
+          if (pluginSettings) {
+            const currentText = pluginSettings.textContent.trim();
+            const newText = `<a href="${urlUpdateLink}" target="_blank">[${pluginName}] Update available: ${pluginVersion} --> ${newVersion}</a><br>`;
+
+            if (currentText === 'No plugin settings are available.') {
+              pluginSettings.innerHTML = newText;
+            } else {
+              pluginSettings.innerHTML += ' ' + newText;
+            }
+          }
+
+          const updateIcon = document.querySelector('.wrapper-outer #navigation .sidenav-content .fa-puzzle-piece') || document.querySelector('.wrapper-outer .sidenav-content') || document.querySelector('.sidenav-content');
+
+          const redDot = document.createElement('span');
+          redDot.style.display = 'block';
+          redDot.style.width = '12px';
+          redDot.style.height = '12px';
+          redDot.style.borderRadius = '50%';
+          redDot.style.backgroundColor = '#FE0830' || 'var(--color-main-bright)'; // Theme colour set here as placeholder only
+          redDot.style.marginLeft = '82px';
+          redDot.style.marginTop = '-12px';
+
+          updateIcon.appendChild(redDot);
+        }
+    }
+}
+
+if (CHECK_FOR_UPDATES) checkUpdate(pluginSetupOnlyNotify, pluginVersion, pluginName, pluginHomepageUrl, pluginUpdateUrl);
 
 })();
