@@ -671,7 +671,7 @@ function updateButtons() {
             updateButton(button, buttonValues[index], index);
             checkBankASum();
             if (typeof sendToast === 'function') { sendToast('info', 'Preset Buttons', `Frequency <strong>${buttonValues[index]} MHz</strong> saved to preset bank <b>${currentBank}</b>, button <b>#${(index + 1)}</b>.`, false, false); }
-            console.log("Preset saved:", buttonValues[index], currentBank, (index + 1));
+            console.log(`[${pluginName}] Preset saved:`, buttonValues[index], currentBank, (index + 1));
           });
         } else {
           // iOS button handling
@@ -721,7 +721,7 @@ function updateButtons() {
             updateButton(button, buttonValues[index], index);
             checkBankASum();
             if (typeof sendToast === 'function') { sendToast('info', 'Preset Buttons', `Frequency <strong>${buttonValues[index]} MHz</strong> saved to preset bank <b>${currentBank}</b>, button <b>#${(index + 1)}</b>.`, false, false); }
-            console.log("Preset saved:", buttonValues[index], currentBank, (index + 1));
+            console.log(`[${pluginName}] Preset saved:`, buttonValues[index], currentBank, (index + 1));
           }
           
           function recallPreset() {
@@ -1032,7 +1032,7 @@ function toggleButtonContainer(statusToast) {
   if (isHidden) {
     if (typeof sendToast === 'function') {
       sendToast('info', 'Preset Buttons', 'Preset Buttons hidden.', false, false);
-      console.log('Button Preset plugin hidden');
+      console.log(`[${pluginName}] Button Preset plugin hidden`);
     }
     let element = document.getElementById('plugin-button-presets');
     element.style.setProperty('display', 'none');
@@ -1059,7 +1059,7 @@ function toggleButtonContainer(statusToast) {
   } else {
     if (typeof sendToast === 'function' && statusToast) {
       sendToast('info', 'Preset Buttons', 'Preset Buttons restored.', false, false);
-      console.log('Button Preset plugin restored');
+      console.log(`[${pluginName}] Button Preset plugin restored`);
     }
     let element = document.getElementById('plugin-button-presets');
     if (window.location.pathname !== '/setup') element.style.setProperty('display', 'flex');
@@ -1172,7 +1172,7 @@ function AdditionalCheckboxesDisplayAll() { // ########## SHOW ALL PRESET BUTTON
             const lastCheckbox = checkboxes[checkboxes.length - 1];
             lastCheckbox.insertAdjacentElement('afterend', newDiv);
         } else {
-            console.warn('There are less than two elements with class "form-group checkbox".');
+            console.warn(`[${pluginName}] There are less than two elements with class "form-group checkbox".`);
         }
     }
     insertHtmlAfterSecondCheckbox();
@@ -1195,7 +1195,7 @@ function AdditionalCheckboxesDisplayAll() { // ########## SHOW ALL PRESET BUTTON
           bankDisplayAllGap();
           toggleButtonContainer();
           updateButtons();
-          console.log("buttonPresetsDisplayAll = false");
+          console.log(`[${pluginName}] buttonPresetsDisplayAll = false`);
         } else {
           bankDisplayAll = true;
           bankDisplayAllGap();
@@ -1203,7 +1203,7 @@ function AdditionalCheckboxesDisplayAll() { // ########## SHOW ALL PRESET BUTTON
           const buttonPresetsBankDropdown = document.getElementById('button-presets-bank-dropdown');
           if (buttonPresetsBankDropdown) buttonPresetsBankDropdown.style.display = 'none';
           updateButtons();
-          console.log("buttonPresetsDisplayAll = true");
+          console.log(`[${pluginName}] buttonPresetsDisplayAll = true`);
         }
         checkImageErrors();
     }
@@ -1263,7 +1263,7 @@ function AdditionalCheckboxesButtonPresets() {
       const lastCheckbox = checkboxes[checkboxes.length - 1];
       lastCheckbox.insertAdjacentElement('afterend', newDiv);
     } else {
-      console.warn('There are less than two elements with class "form-group checkbox".');
+      console.warn(`[${pluginName}] There are less than two elements with class "form-group checkbox".`);
     }
   }
   insertHtmlAfterSecondCheckbox();
@@ -1484,7 +1484,7 @@ function importLocalStorageFromFile(file) {
       if (typeof sendToast === 'function') {
         sendToast('success', 'Preset Buttons Import', 'Preset data successfully imported.', false, false);
       }
-      console.log('Button Preset localStorage updated successfully');
+      console.log(`[${pluginName}] Button Preset localStorage updated successfully`);
     } catch (e) {
       if (typeof sendToast === 'function') {
         sendToast('error', 'Preset Buttons Import', 'Error importing preset data.', false, false);
