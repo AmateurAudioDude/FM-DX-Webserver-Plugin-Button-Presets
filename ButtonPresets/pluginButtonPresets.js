@@ -840,7 +840,7 @@ function updateButtons() {
             textElement.style.bottom = padding;
             textElement.style.visibility = "hidden";
             textElement.style.color = "var(--color-text)";
-            textElement.style.fontFamily = window.getComputedStyle(document.getElementById('data-ps')).fontFamily;
+            if (window.location.pathname !== '/setup') textElement.style.fontFamily = window.getComputedStyle(document.getElementById('data-ps')).fontFamily;
             button.appendChild(textElement);
             
             // Add hover effect for image and text
