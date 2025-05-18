@@ -13,6 +13,12 @@ This plugin allows locally-stored frequency presets, displayed below general FM-
 
 ![popup](https://github.com/user-attachments/assets/ad910fdb-ae7d-4b4c-aea4-9e6acfd13b56)
 
+v1.3.2
+------
+* Uses WebP for default icon
+* Checks if .webp or .svg extension exists for any missing .png files
+* Updated Themed Popups version
+
 v1.3.1
 ------
 * Fix for FM-DX Webserver v1.3.7 compatibility issues

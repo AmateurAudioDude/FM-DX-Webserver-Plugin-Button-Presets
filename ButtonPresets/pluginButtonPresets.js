@@ -1,5 +1,5 @@
 /*
-    Preset Buttons v1.3.1 by AAD
+    Preset Buttons v1.3.2 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -43,7 +43,7 @@ const defaultPresetData = {
 
 */
 
-const pluginVersion = '1.3.1';
+const pluginVersion = '1.3.2';
 const pluginName = "Preset Buttons";
 const pluginHomepageUrl = "https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets";
 const pluginUpdateUrl = "https://raw.githubusercontent.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets/refs/heads/main/ButtonPresets/pluginButtonPresets.js";
@@ -57,7 +57,7 @@ let bankDisplayAll = false;
 pluginButtonPresets = true;
 
 // Create default logo
-let defaultButtonPresetImagePath = ' data:image/png;base64,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';
+let defaultButtonPresetImagePath = ' data:image/webp;base64,UklGRpQEAABXRUJQVlA4TIgEAAAvP8APEBXRkf/Pbd1c5R2FR8FRcBQcBUdBKWdlqdvR7v4ZVDv8lMXKgT0652z3QEnVL5RK/Ds8OBsFR5EDdM6JPUf9dhRQeegcqCyCM1RW9ypns2LnNpJkV5n8o/ghYGqY89DCw5yfidPYtq1ml85zyPwTeSaKEpD7dnLoxCDANKGEEkooRznKUW4yBm4bKUr3aPnuBv6A+xnIAXlQAStgbFCZTTjUYp2Kdebxx8XMiJk61R9RxgL6TWGBasOBCiDPHRidErVrxjMnZkHkmXdyrOqxhg1V26qpWJBc4sFqd20x65lXX398uvoaTq42SHkFz+Apbm4JTF8rX66BuoCXFBYYgJ3xyvPq741PP5WERMbTd7QCBHxXqPJd1fiPkdcaO1m+svr748ynq7+BmZOEmcPwXv+EoXF0SiDAhig8uDlQRY5YtFa6XF0ETPjM+ueLM2c4OZeWqqVSN2f7ShiuPobV22A6MeK9ZarqVu2UYFEnnFg0gN9XdXUg5c3XGx99dIVdM8+BqFTVGZrwbg+2mdtApn3aDKgPjbFrdLy25c3/HXbLkOsycGR2RR7JBZTVtGW23X082GaOkKpl4FWzantiPL2xokSViN9ixHYWeIy8UVteryR2GkDWcGFc2P2DRgZgDizLNnMuQtSXCDjAqjFPr9qcmLrCxvBoxEcQFZIBcCS5sv55o8nqvtHPNfUbqgzDb1dvD0yXrPAdekPzh7mteI1HnGRoEJN4lzdfd5r8rmakZXQawG2zbWpcXWCx0Gw79pacZKzw2k7ilgUG6jlCNOOlK7MAaORl1QAs1XYzXb0JwwA2SH2Nx2J0JE85ICAW63pJG+NXJPvlMy8t8U4g62sURU5NrW2mU7OPvGCGfZKhAwYEWPVMkZGWiSIl1+KA7x8oyMWqVnT071lEqJs//jBixoDgMo9GbGV0loG2IgAGigNlzHkABMOfZQPZhw2GVa0QMyE8p3NA40oi2a/ezgcAv9C/aG9otuDpAt/pRIovgMd0vstrJ6qEVTU0OmVPp7fiw3dY0E70Yat0CbQuOkWm8zcZdqHSRO3qJrJrFWmZieoKMVcAwaWERzwhHzrCHEiz2141duu3lN0eQaw53hhdhQsGYq8cj3gn8ac68Zt2NX6Tmm1T0yJ+M4Bm90MHBGCnRMy6DN+R3/M8Lz18JbGqK/tt4OUruuT9HAhib8lKXL2yfj8mESneyc0mtxarixtuXoaoT76vmqujxR3F88CAxq1kS9w6w63nUFaBHre65HfsBxbM038YPXI6ZZiTq8B3NCROuClLMulRolSPmx3Af4X8xuwtY1zdWCNOndIjgD4432+DELf5zEdnrvCsPQ16URBMWismPKVFPezVfoQPILtta/zKaYdURbKcOfMpMydSzDe1zHMuIzafH6gha5LIH0+Yz3wqFTKTvKWlnUir2xtXTawlrr0AcMQzy7z6G2jeDFfM210AcCBVpK2KVX39pwCIuj/NmGjWSrMyebmooxbZYAEjYOfHIHKqvczjj4uZvXjxhVP7QTX/zTe3cP8CAQ==';
 
 // Create a style element
 let styleButtonPresets = document.createElement('style');
@@ -426,6 +426,7 @@ function replacePresets() {
                         event.stopPropagation();
                         currentBank = bank;
                         updateButtons();
+                        checkImageErrors();
                     }, true);
 
                     if (bankQuantity === 8 && originalContainer && parentNode && !newContainer1) {
@@ -993,7 +994,7 @@ function updateButtons() {
         // Function to get the image source and determine if it’s local or external
         function getImageSrc() {
           const logoImg = document.getElementById('station-logo');
-          if (logoImg && logoImg.src && !logoImg.src.startsWith('data:image/png;base64') && !logoImg.src.includes('default')) {
+          if (logoImg && logoImg.src && !logoImg.src.startsWith('data:image/png;base64') && !logoImg.src.startsWith('data:image/webp;base64') && !logoImg.src.includes('default')) {
             const imageUrl = logoImg.src;
             if (isImageLocal(imageUrl)) {
               // Handle local image
@@ -1327,7 +1328,7 @@ function executeInfoCode() {
   
   // Add event listener to show alert when icon is clicked
   infoIcon.addEventListener('click', function() {
-    if (typeof pluginThemedPopup !== 'undefined') {
+    if (window.hasCustomPopup) {
       alert(`<strong>PRESET BUTTONS</strong>
             <i>This feature allows you to store up to ${bankQuantity * 10} presets, with 10 presets per bank.
             To store a frequency:</i>
@@ -1394,17 +1395,55 @@ function checkImageErrors() {
   if (containerButtonPresets) {
     containerButtonPresets.querySelectorAll('img').forEach(img => {
       img.onerror = () => {
-        img.src = defaultButtonPresetImagePath;
-        img.style.filter = 'grayscale(100%)';
-        img.style.maxWidth = '92px';
-        img.style.maxHeight = '36px';
-        img.style.opacity = '0.5';
+        const imgSrc = img.src;
+        const fileName = imgSrc.substring(imgSrc.lastIndexOf('/') + 1, imgSrc.lastIndexOf('.'));
+        const fileExtension = imgSrc.substring(imgSrc.lastIndexOf('.'));
+
+        // Check if .png
+        if (fileExtension === '.png') {
+          const webpSrc = imgSrc.replace('.png', '.webp');
+
+          // Check if .webp
+          const webpImage = new Image();
+          webpImage.onload = () => {
+            img.src = webpSrc; // Use .webp if it exists
+          };
+          webpImage.onerror = () => {
+            // If .webp doesn't exist, check for .svg
+            const svgSrc = imgSrc.replace('.png', '.svg');
+            const svgImage = new Image();
+            svgImage.onload = () => {
+              img.src = svgSrc; // Use .svg if it exists
+            };
+            svgImage.onerror = () => {
+              img.src = defaultButtonPresetImagePath; // If neither .webp nor .svg, fallback to default
+            };
+            svgImage.src = svgSrc;
+          };
+          webpImage.src = webpSrc;
+        } else if (fileExtension === '.svg') {
+          const svgImage = new Image();
+          svgImage.onload = () => {
+            img.src = imgSrc; // Use .svg if it exists
+          };
+          svgImage.onerror = () => {
+            img.src = defaultButtonPresetImagePath; // If not .svg, fallback to default
+          };
+          svgImage.src = imgSrc;
+        } else {
+          // Default image
+          img.src = defaultButtonPresetImagePath;
+          img.style.filter = 'grayscale(100%)';
+          img.style.maxWidth = '92px';
+          img.style.maxHeight = '36px';
+          img.style.opacity = '0.5';
+        }
       };
 
       img.addEventListener('mousedown', (e) => {
         if (e.button === 0) {
-              e.preventDefault(); // Prevent the default drag behavior
-          }
+          e.preventDefault(); // Prevent the default drag behavior
+        }
       });
     });
   }
@@ -1576,45 +1615,62 @@ function createImportExportButtons() {
 createImportExportButtons();
 
 /*
-    Themed Popups v1.1.2 by AAD
+    Themed Popups v1.1.3 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Themed-Popups
 */
 
-let styleElementButtonPresets = document.createElement('style');
-let cssCodeThemedPopupsButtonPresets = `
-/* Themed Popups CSS */
-.popup-plugin {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: var(--color-2); /* Background */
-    color: var(--color-main-bright); /* Text */
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-    opacity: 0;
-    transition: opacity 0.3s ease-in;
-    z-index: 9999;
-}
+let isStylePopup = false;
 
-.popup-plugin-content {
-    text-align: center;
-}
+function stylePopup() {
+    let styleElementButtonPresets = document.createElement('style');
+    let cssCodeThemedPopupsButtonPresets = `
+    /* Themed Popups CSS */
+    .popup-plugin {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: var(--color-2);
+        color: var(--color-main-bright);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        opacity: 0;
+        transition: opacity 0.3s ease-in;
+        z-index: 9999;
 
-.popup-plugin button {
-    margin-top: 10px;
-}
+        /* Responsive sizing */
+        max-width: 90vw;
+        max-height: 90vh;
+        overflow: auto;
+    }
 
-.popup-plugin.open {
-    opacity: .99;
+    @media (max-width: 400px) {
+        .popup-plugin {
+            padding: 10px;
+        }
+    }
+
+    .popup-plugin-content {
+        text-align: center;
+    }
+
+    .popup-plugin button {
+        margin-top: 10px;
+    }
+
+    .popup-plugin.open {
+        opacity: 0.99;
+    }
+    `;
+    styleElementButtonPresets.appendChild(document.createTextNode(cssCodeThemedPopupsButtonPresets));
+    document.head.appendChild(styleElementButtonPresets);
+    isStylePopup = true;
 }
-`;
-styleElementButtonPresets.appendChild(document.createTextNode(cssCodeThemedPopupsButtonPresets));
-document.head.appendChild(styleElementButtonPresets);
 
 // Function to create the alert popup
 function alertButtonPresets(popupMessage, popupButton) {
+    if (!isStylePopup) stylePopup();
     if (typeof popupButton === 'undefined') {
         popupButton = 'OK';
     }
