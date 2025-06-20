@@ -3,6 +3,11 @@
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
+'use strict';
+
+// Global variables for other plugins
+const pluginButtonPresets = true;
+
 (() => {
 
 //////////////////////////////////////////////////
@@ -52,9 +57,6 @@ const CHECK_FOR_UPDATES = true;
 
 // Initial value
 let bankDisplayAll = false;
-
-// Global variables for other plugins
-pluginButtonPresets = true;
 
 // Create default logo
 let defaultButtonPresetImagePath = ' data:image/webp;base64,UklGRpQEAABXRUJQVlA4TIgEAAAvP8APEBXRkf/Pbd1c5R2FR8FRcBQcBUdBKWdlqdvR7v4ZVDv8lMXKgT0652z3QEnVL5RK/Ds8OBsFR5EDdM6JPUf9dhRQeegcqCyCM1RW9ypns2LnNpJkV5n8o/ghYGqY89DCw5yfidPYtq1ml85zyPwTeSaKEpD7dnLoxCDANKGEEkooRznKUW4yBm4bKUr3aPnuBv6A+xnIAXlQAStgbFCZTTjUYp2Kdebxx8XMiJk61R9RxgL6TWGBasOBCiDPHRidErVrxjMnZkHkmXdyrOqxhg1V26qpWJBc4sFqd20x65lXX398uvoaTq42SHkFz+Apbm4JTF8rX66BuoCXFBYYgJ3xyvPq741PP5WERMbTd7QCBHxXqPJd1fiPkdcaO1m+svr748ynq7+BmZOEmcPwXv+EoXF0SiDAhig8uDlQRY5YtFa6XF0ETPjM+ueLM2c4OZeWqqVSN2f7ShiuPobV22A6MeK9ZarqVu2UYFEnnFg0gN9XdXUg5c3XGx99dIVdM8+BqFTVGZrwbg+2mdtApn3aDKgPjbFrdLy25c3/HXbLkOsycGR2RR7JBZTVtGW23X082GaOkKpl4FWzantiPL2xokSViN9ixHYWeIy8UVteryR2GkDWcGFc2P2DRgZgDizLNnMuQtSXCDjAqjFPr9qcmLrCxvBoxEcQFZIBcCS5sv55o8nqvtHPNfUbqgzDb1dvD0yXrPAdekPzh7mteI1HnGRoEJN4lzdfd5r8rmakZXQawG2zbWpcXWCx0Gw79pacZKzw2k7ilgUG6jlCNOOlK7MAaORl1QAs1XYzXb0JwwA2SH2Nx2J0JE85ICAW63pJG+NXJPvlMy8t8U4g62sURU5NrW2mU7OPvGCGfZKhAwYEWPVMkZGWiSIl1+KA7x8oyMWqVnT071lEqJs//jBixoDgMo9GbGV0loG2IgAGigNlzHkABMOfZQPZhw2GVa0QMyE8p3NA40oi2a/ezgcAv9C/aG9otuDpAt/pRIovgMd0vstrJ6qEVTU0OmVPp7fiw3dY0E70Yat0CbQuOkWm8zcZdqHSRO3qJrJrFWmZieoKMVcAwaWERzwhHzrCHEiz2141duu3lN0eQaw53hhdhQsGYq8cj3gn8ac68Zt2NX6Tmm1T0yJ+M4Bm90MHBGCnRMy6DN+R3/M8Lz18JbGqK/tt4OUruuT9HAhib8lKXL2yfj8mESneyc0mtxarixtuXoaoT76vmqujxR3F88CAxq1kS9w6w63nUFaBHre65HfsBxbM038YPXI6ZZiTq8B3NCROuClLMulRolSPmx3Af4X8xuwtY1zdWCNOndIjgD4432+DELf5zEdnrvCsPQ16URBMWismPKVFPezVfoQPILtta/zKaYdURbKcOfMpMydSzDe1zHMuIzafH6gha5LIH0+Yz3wqFTKTvKWlnUir2xtXTawlrr0AcMQzy7z6G2jeDFfM210AcCBVpK2KVX39pwCIuj/NmGjWSrMyebmooxbZYAEjYOfHIHKqvczjj4uZvXjxhVP7QTX/zTe3cP8CAQ==';
@@ -796,6 +798,7 @@ function updateButtons() {
           const imageSrc = (buttonImages && buttonImages[index]) || ''; // Ensure imageSrc is a valid string
           const padding = "6px";
           const displayText = `${formatValue(value).trim()}<span id="button-preset-ps" style="display: block; margin-top: -2px; white-space: nowrap; overflow: hidden; font-weight: 500;">${psValue.trim()}</span>`;
+          let paddingMobile;
           
           button.style.position = "relative"; // Ensure button is positioned to contain the image
           button.style.padding = padding;
