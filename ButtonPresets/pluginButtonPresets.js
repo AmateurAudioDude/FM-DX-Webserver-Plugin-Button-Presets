@@ -1,5 +1,5 @@
 /*
-    Preset Buttons v1.3.2 by AAD
+    Preset Buttons v1.3.3 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -12,7 +12,7 @@ const pluginButtonPresets = true;
 
 //////////////////////////////////////////////////
 
-const bankMenuLocation = 'ims' // ims, bw, ant, eq, top, top-replace, hidden
+const bankMenuLocation = 'top' // ims, bw, ant, eq, top, top-replace, hidden
 const bankMenuPosition = 'after' // before, after
 const bankMenuPaddingLeft = '15' // value in px
 const bankMenuPaddingRight = '0' // value in px
@@ -20,9 +20,11 @@ const bankMenuBorderLeftRadius = true; // true, false
 const bankMenuBorderRightRadius = true; // true, false
 const bankMenuCustomWidth = 'default'; // default, value in px or %
 const bankName = 'Bank'; // dropdown menu name
-const bankQuantity = 4; // total number of banks ranging from 3-8
+const bankQuantity = 4; // total number of banks ranging from 3-8 (for 'top' or 'top-replace' use 4 or 8)
 const optionHidePresetButtons = false; // true, false
 const optionHideDisplayAll = true; // true, false
+const optionSaveAntenna = (!!document.getElementById('data-ant')); // (!!document.getElementById('data-ant')), true, false
+const optionAntennaDisplay = 'number'; // number, letter
 const displayDefaultLogo = true; // true, false
 const enableDefaultLogo = 'unnamed'; // all, named, unnamed
 const infoIcon = true; // true, false
@@ -48,7 +50,7 @@ const defaultPresetData = {
 
 */
 
-const pluginVersion = '1.3.2';
+const pluginVersion = '1.3.3';
 const pluginName = "Preset Buttons";
 const pluginHomepageUrl = "https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets";
 const pluginUpdateUrl = "https://raw.githubusercontent.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets/refs/heads/main/ButtonPresets/pluginButtonPresets.js";
@@ -296,22 +298,24 @@ function getStoredData(bank) {
   const key = `buttonPresets${bank}`;
   let dataButtonPresets;
   if (bank === "A") {
-    dataButtonPresets = JSON.parse(localStorage.getItem(key)) || { values: [...defaultPresetData.values], ps: [...defaultPresetData.names], images: [...defaultPresetData.urls] };
+    dataButtonPresets = JSON.parse(localStorage.getItem(key)) || { values: [...defaultPresetData.values], antennas: Array(10).fill(''), ps: [...defaultPresetData.names], images: [...defaultPresetData.urls] };
   } else {
-    dataButtonPresets = JSON.parse(localStorage.getItem(key)) || { values: Array(10).fill(87.5), ps: Array(10).fill(''), images: Array(10).fill('') };
+    dataButtonPresets = JSON.parse(localStorage.getItem(key)) || { values: Array(10).fill(87.5), antennas: Array(10).fill(''), ps: Array(10).fill(''), images: Array(10).fill('') };
   }
   return dataButtonPresets;
 }
 
 // Function to save button values, data-ps values, and images to localStorage
-function saveToLocalStorage(bank, buttonValues, psValues, buttonImages, tooltipValues) {
+function saveToLocalStorage(bank, buttonValues, antennaValues, psValues, buttonImages, tooltipValues) {
   const sanitizedButtonValues = buttonValues.map(value => value === null ? "" : value);
+  const sanitizedAntennaValues = antennaValues.map(value => value === null ? "" : value);
   const sanitizedPsValues = psValues.map(value => value === null ? "" : value);
   const sanitizedButtonImages = buttonImages.map(value => value === null ? "" : value);
   const sanitizedTooltipValues = tooltipValues.map(value => value === null ? "" : value);
-  
+
   localStorage.setItem(`buttonPresets${bank}`, JSON.stringify({
     values: sanitizedButtonValues,
+    antennas: sanitizedAntennaValues,
     ps: sanitizedPsValues,
     images: sanitizedButtonImages,
     tooltips: sanitizedTooltipValues
@@ -590,14 +594,30 @@ document.addEventListener('click', function(event) {
 function getTooltipValue() {
   const dataStationNameElement = document.getElementById('data-station-name');
   const dataPsElement = document.getElementById('data-ps');
-  
+
   // Check if #data-station-name exists and is visible
   if (dataStationNameElement && dataStationNameElement.offsetParent !== null) {
     return dataStationNameElement.textContent.trim();
   }
-  
+
   // Fallback to #data-ps if #data-station-name doesn't exist or isn't visible
   return dataPsElement ? dataPsElement.textContent.trim() : '';
+}
+
+// Function to get the current antenna value
+function getCurrentAntennaValue() {
+  const dataAntInput = document.querySelector('.data-ant input');
+  if (dataAntInput) {
+    const currentAntennaText = dataAntInput.value || dataAntInput.placeholder;
+    // Find the option that matches the current text
+    const options = document.querySelectorAll('.data-ant li.option');
+    for (let option of options) {
+      if (option.textContent.trim() === currentAntennaText.trim()) {
+        return !optionSaveAntenna ? '0' : (option.getAttribute('data-value') || '0');
+      }
+    }
+  }
+  return '0'; // Default antenna value
 }
 
 // Update buttons on orientation change
@@ -630,6 +650,7 @@ function updateButtons() {
 
     let storedData = getStoredData(currentBank);
     let buttonValues = storedData.values;
+    let antennaValues = storedData.antennas || [];
     let psValues = storedData.ps;
     let buttonImages = storedData.images || [];
     let tooltipValues = storedData.tooltips || [];
@@ -651,9 +672,11 @@ function updateButtons() {
           button.addEventListener('click', function() {
             let commandInput = document.getElementById('commandinput');
             const presetInput = buttonValues[index];
+            const antennaInput = antennaValues[index];
             
             if (socket.readyState === WebSocket.OPEN) {
               socket.send("T" + (Math.round((presetInput).toFixed(3) * 1000)));
+              if (optionSaveAntenna && antennaInput) socket.send("Z" + antennaInput);
             }
             checkBankASum();
           });
@@ -668,13 +691,19 @@ function updateButtons() {
             let tooltipValue = (dataStationNameElement && dataStationNameElement.offsetParent !== null) ? dataStationNameElement.textContent : dataPs;
             
             buttonValues[index] = parseFloat(dataFrequency) || 87.5;
+            antennaValues[index] = getCurrentAntennaValue();
             psValues[index] = dataPs;
             tooltipValues[index] = tooltipValue;
             buttonImages[index] = getImageSrc();
             updateButton(button, buttonValues[index], index);
             checkBankASum();
-            if (typeof sendToast === 'function') { sendToast('info', 'Preset Buttons', `Frequency <strong>${buttonValues[index]} MHz</strong> saved to preset bank <b>${currentBank}</b>, button <b>#${(index + 1)}</b>.`, false, false); }
-            console.log(`[${pluginName}] Preset saved:`, buttonValues[index], currentBank, (index + 1));
+            if (typeof sendToast === 'function') {
+                let antennaToast = optionSaveAntenna 
+                    ? ` (Ant ${optionAntennaDisplay === 'letter' ? String.fromCharCode(65 + Number(getCurrentAntennaValue())) : Number(getCurrentAntennaValue()) + 1})` 
+                    : '';
+                sendToast('info', 'Preset Buttons', `Frequency <strong>${buttonValues[index]} MHz${antennaToast}</strong> saved to preset bank <b>${currentBank}</b>, button <b>#${(index + 1)}</b>.`, false, false);
+            }
+            console.log(`[${pluginName}] Preset saved:`, buttonValues[index] + ` (${getCurrentAntennaValue()})`, currentBank, (index + 1));
           });
         } else {
           // iOS button handling
@@ -718,21 +747,29 @@ function updateButtons() {
             let tooltipValue = (dataStationNameElement && dataStationNameElement.offsetParent !== null) ? dataStationNameElement.textContent : dataPs;
             
             buttonValues[index] = parseFloat(dataFrequency) || 87.5;
+            antennaValues[index] = getCurrentAntennaValue();
             psValues[index] = dataPs;
             tooltipValues[index] = tooltipValue;
             buttonImages[index] = getImageSrc();
             updateButton(button, buttonValues[index], index);
             checkBankASum();
-            if (typeof sendToast === 'function') { sendToast('info', 'Preset Buttons', `Frequency <strong>${buttonValues[index]} MHz</strong> saved to preset bank <b>${currentBank}</b>, button <b>#${(index + 1)}</b>.`, false, false); }
-            console.log(`[${pluginName}] Preset saved:`, buttonValues[index], currentBank, (index + 1));
+            if (typeof sendToast === 'function') {
+                let antennaToast = optionSaveAntenna 
+                    ? ` (Ant ${optionAntennaDisplay === 'letter' ? String.fromCharCode(65 + Number(getCurrentAntennaValue())) : Number(getCurrentAntennaValue()) + 1})` 
+                    : '';
+                sendToast('info', 'Preset Buttons', `Frequency <strong>${buttonValues[index]} MHz${antennaToast}</strong> saved to preset bank <b>${currentBank}</b>, button <b>#${(index + 1)}</b>.`, false, false);
+            }
+            console.log(`[${pluginName}] Preset saved:`, buttonValues[index] + ` (${getCurrentAntennaValue()})`, currentBank, (index + 1));
           }
           
           function recallPreset() {
             let commandInput = document.getElementById('commandinput');
             const presetInput = buttonValues[index];
+            const antennaInput = antennaValues[index];
             
             if (socket.readyState === WebSocket.OPEN) {
               socket.send("T" + (Math.round((presetInput).toFixed(3) * 1000)));
+              if (optionSaveAntenna && antennaInput) socket.send("Z" + antennaInput);
             }
             checkBankASum();
           }
@@ -751,6 +788,7 @@ function updateButtons() {
               let dataPs = dataPsElement ? dataPsElement.textContent : '';
               
               buttonValues[index] = parseFloat(dataFrequency) || 87.5;
+              antennaValues[index] = getCurrentAntennaValue();
               psValues[index] = dataPs;
               buttonImages[index] = getImageSrc();
               tooltipValues[index] = getTooltipValue() || ''; // Ensures tooltipValue is not null
@@ -759,6 +797,7 @@ function updateButtons() {
             } else if (e.shiftKey && e.key === 'R') {
               // SHIFT + R key combination
               buttonValues[index] = 87.5;
+              antennaValues[index] = '';
               psValues[index] = '';
               buttonImages[index] = '';
               tooltipValues[index] = ''; // Reset the tooltip value as well
@@ -773,6 +812,7 @@ function updateButtons() {
           if (e.button === 1 || e.ctrlKey || (e.shiftKey && e.button === 0)) {
             if (e.button === 1 || (e.shiftKey && e.button === 0)) {
               buttonValues[index] = 87.5;
+              antennaValues[index] = '';
               psValues[index] = '';
               buttonImages[index] = '';
               tooltipValues[index] = ''; // Reset the tooltip value as well
@@ -783,6 +823,7 @@ function updateButtons() {
               let dataPs = dataPsElement ? dataPsElement.textContent : '';
               
               buttonValues[index] = parseFloat(dataFrequency) || 87.5;
+              antennaValues[index] = getCurrentAntennaValue();
               psValues[index] = dataPs;
               buttonImages[index] = getImageSrc();
               tooltipValues[index] = getTooltipValue() || ''; // Ensures tooltipValue is not null
@@ -793,11 +834,17 @@ function updateButtons() {
         });
         
         function updateButton(button, value, index) {
+          const antennaInput = antennaValues[index];
           const psValue = psValues[index] || ''; // Ensure psValue is always used for button text
           const tooltipValue = tooltipValues[index] || psValue; // Fallback to psValue if tooltipValue is undefined
           const imageSrc = (buttonImages && buttonImages[index]) || ''; // Ensure imageSrc is a valid string
           const padding = "6px";
-          const displayText = `${formatValue(value).trim()}<span id="button-preset-ps" style="display: block; margin-top: -2px; white-space: nowrap; overflow: hidden; font-weight: 500;">${psValue.trim()}</span>`;
+          let antennaButton = antennaInput && optionSaveAntenna
+              ? window.innerWidth > 1080
+                  ? `<span class="fa-solid fa-tower-broadcast" style="font-size: 9px; position: absolute; top: 1px; margin-left: 4px; white-space: nowrap; overflow: hidden; display: inline-block;"></span><span style="font-size: 10px; position: absolute; top: -1px; margin-left: 16px; white-space: nowrap; overflow: hidden; display: inline-block;">${optionAntennaDisplay === 'letter' ? String.fromCharCode(65 + Number(antennaInput)) : Number(antennaInput) + 1}</span>`
+                  : `<span style="font-size: 10px; position: absolute; top: -1px; margin-left: 1px; white-space: nowrap; overflow: hidden; display: inline-block;">${optionAntennaDisplay === 'letter' ? String.fromCharCode(65 + Number(antennaInput)) : Number(antennaInput) + 1}</span>`
+              : '';
+          const displayText = `${formatValue(value).trim()}${antennaButton}<span id="button-preset-ps" style="display: block; margin-top: -2px; white-space: nowrap; overflow: hidden; font-weight: 500;">${psValue.trim()}</span>`;
           let paddingMobile;
           
           button.style.position = "relative"; // Ensure button is positioned to contain the image
@@ -952,7 +999,7 @@ function updateButtons() {
               currentBank = '';
             }
           }
-          saveToLocalStorage(currentBank, buttonValues, psValues, buttonImages, tooltipValues);
+          saveToLocalStorage(currentBank, buttonValues, antennaValues, psValues, buttonImages, tooltipValues);
         }
         
         function formatValue(value) {
@@ -1309,6 +1356,17 @@ function checkBankASum() {
   }
 }
 
+// Native popup window
+function popupMethod(selector, title, contentHtml) {
+    const $popup = $(selector);
+    const $header = $popup.find(".popup-header");
+    const $title = $header.find("p.color-4");
+    if ($title.length && !$title.hasClass("popup-title")) $title.addClass("popup-title");
+    $popup.find(".popup-title").text(title);
+    $popup.find(".popup-content").html(contentHtml);
+    togglePopup(selector);
+}
+
 // Function to execute when the sum is 875
 function executeInfoCode() {
   // Create a new div for the info icon
@@ -1331,33 +1389,25 @@ function executeInfoCode() {
   
   // Add event listener to show alert when icon is clicked
   infoIcon.addEventListener('click', function() {
-    if (window.hasCustomPopup) {
-      alert(`<strong>PRESET BUTTONS</strong>
-            <i>This feature allows you to store up to ${bankQuantity * 10} presets, with 10 presets per bank.
-            To store a frequency:</i>
+    let bankText = `<b>${bankName}</b> `;
+    let bankQuantityText = '.';
+    if (bankMenuLocation.includes('top')) bankText = '';
+    if (bankQuantity > 3) bankQuantityText = ', etc...';
+    const popupId = "#popup-panel-mobile-settings";
+    const newTitle = `Preset Buttons`;
+    const newContent = `<p style="text-align: center;"><i>This feature allows you to store up to ${bankQuantity * 10} presets, with 10 presets per bank.
+    To store a frequency:</i>
 
-            <strong><i>Left-click</i></strong> or <strong><i>ENTER</i></strong> to recall the preset.
-            <strong><i>Right-click</i></strong>, <strong><i>CTRL+click</i></strong>, or <strong><i>SHIFT+S</i></strong> to store the preset.
-            <strong><i>Middle-click</i></strong>, <strong><i>SHIFT+click</i></strong>, or <strong><i>SHIFT+R</i></strong> to reset the preset.
-            
-            Use the <b>Bank</b> dropdown menu to select from Banks <i>A</i>, <i>B</i>, or <i>C</i>.
+    <strong><i>Left-click</i></strong> or <strong><i>ENTER</i></strong> to recall the preset.
+    <strong><i>Right-click</i></strong>, <strong><i>CTRL+click</i></strong>, or <strong><i>SHIFT+S</i></strong> to store the preset.
+    <strong><i>Middle-click</i></strong>, <strong><i>SHIFT+click</i></strong>, or <strong><i>SHIFT+R</i></strong> to reset the preset.
+    
+    Use the ${bankText}dropdown menu to select from Banks <i>A</i>, <i>B</i>, or <i>C</i>${bankQuantityText}
 
-            <strong>Stored presets are saved only on the current browser.</strong><br>
-            `, 'Close');
-    } else {
-      alertButtonPresets(`<strong>PRESET BUTTONS</strong>
-            <i>This feature allows you to store up to ${bankQuantity * 10} presets, with 10 presets per bank.
-            To store a frequency:</i>
-
-            <strong><i>Left-click</i></strong> or <strong><i>ENTER</i></strong> to recall the preset.
-            <strong><i>Right-click</i></strong>, <strong><i>CTRL+click</i></strong>, or <strong><i>SHIFT+S</i></strong> to store the preset.
-            <strong><i>Middle-click</i></strong>, <strong><i>SHIFT+click</i></strong>, or <strong><i>SHIFT+R</i></strong> to reset the preset.
-            
-            Use the <b>Bank</b> dropdown menu to select from Banks <i>A</i>, <i>B</i>, or <i>C</i>.
-
-            <strong>Stored presets are saved only on the current browser.</strong><br>
-            `, 'Close');
-    }
+    <strong>Stored presets are saved only on the current browser.</strong>
+    </p>`;
+    const formattedContent = newContent.replace(/\n/g, '<br>');
+    popupMethod(popupId, newTitle, formattedContent);
   });
   
   // Append the icon to the container and the container to the body
@@ -1616,142 +1666,6 @@ function createImportExportButtons() {
 
 // Call function to create and append import/export buttons
 createImportExportButtons();
-
-/*
-    Themed Popups v1.1.3 by AAD
-    https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Themed-Popups
-*/
-
-let isStylePopup = false;
-
-function stylePopup() {
-    let styleElementButtonPresets = document.createElement('style');
-    let cssCodeThemedPopupsButtonPresets = `
-    /* Themed Popups CSS */
-    .popup-plugin {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: var(--color-2);
-        color: var(--color-main-bright);
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-        opacity: 0;
-        transition: opacity 0.3s ease-in;
-        z-index: 9999;
-
-        /* Responsive sizing */
-        max-width: 90vw;
-        max-height: 90vh;
-        overflow: auto;
-    }
-
-    @media (max-width: 400px) {
-        .popup-plugin {
-            padding: 10px;
-        }
-    }
-
-    .popup-plugin-content {
-        text-align: center;
-    }
-
-    .popup-plugin button {
-        margin-top: 10px;
-    }
-
-    .popup-plugin.open {
-        opacity: 0.99;
-    }
-    `;
-    styleElementButtonPresets.appendChild(document.createTextNode(cssCodeThemedPopupsButtonPresets));
-    document.head.appendChild(styleElementButtonPresets);
-    isStylePopup = true;
-}
-
-// Function to create the alert popup
-function alertButtonPresets(popupMessage, popupButton) {
-    if (!isStylePopup) stylePopup();
-    if (typeof popupButton === 'undefined') {
-        popupButton = 'OK';
-    }
-    if (!popupOpened) { // Check if a popup is not already open
-        popup = document.createElement('div');
-        popup.classList.add('popup-plugin');
-        popup.innerHTML = `<div class="popup-plugin-content">${popupMessage.replace(/\n/g, '<br>')}<button id="popup-plugin-close">${popupButton}</button></div>`;
-        document.body.appendChild(popup);
-
-        let closeButton = popup.querySelector('#popup-plugin-close');
-        closeButton.addEventListener('click', closePopup);
-
-        popup.addEventListener('click', function(event) {
-            event.stopPropagation(); // Prevent event propagation
-        });
-
-        // Trigger the fade-in effect
-        setTimeout(function() {
-            popup.classList.add('open');
-            popupOpened = true; // Set popupOpened flag to true
-            blurBackground(true);
-        }, 10);
-    }
-}
-
-function blurBackground(status) {
-    // Blur background
-    if (status === true) {
-      if (idModal) {
-          idModal.style.display = 'block';
-        setTimeout(function() {
-          idModal.style.opacity = '1';
-        }, 40);
-      }
-    } else {
-      // Restore background
-      if (idModal) {
-        setTimeout(function() {
-          idModal.style.display = 'none';
-        }, 400);
-          idModal.style.opacity = '0';
-      }
-    }
-}
-
-// Global variables for popup state
-let popupOpened = false;
-let popup;
-
-let popupPromptOpened = false;
-let idModal = document.getElementById('myModal');
-
-// Function to close the popup
-function closePopup(event) {
-    event.stopPropagation(); // Prevent event propagation
-    popupOpened = false; // Set popupOpened flag to false
-    popup.classList.remove('open'); // Fade out
-    setTimeout(function() {
-        popup.remove();
-        blurBackground(false);
-    }, 300); // Remove after fade-out transition
-}
-
-// Event listener for ESC key to close popup
-document.addEventListener('keydown', function(event) {
-    if (popupOpened && (event.key === 'Escape' || event.key === 'Enter')) {
-        closePopup(event);
-        blurBackground(false);
-    }
-});
-
-// Event listener for clicks outside the popup to close it
-document.addEventListener('click', function(event) {
-    if (popupOpened && !popup.contains(event.target)) {
-        closePopup(event);
-        blurBackground(false);
-    }
-});
 
 // Function for update notification in /setup
 function checkUpdate(setupOnly, pluginVersion, pluginName, urlUpdateLink, urlFetchLink) {
