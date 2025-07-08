@@ -1,5 +1,5 @@
 /*
-    Preset Buttons v1.3.3 by AAD
+    Preset Buttons v1.3.4 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -20,11 +20,12 @@ const bankMenuBorderLeftRadius = true; // true, false
 const bankMenuBorderRightRadius = true; // true, false
 const bankMenuCustomWidth = 'default'; // default, value in px or %
 const bankName = 'Bank'; // dropdown menu name
-const bankQuantity = 4; // total number of banks ranging from 3-8 (for 'top' or 'top-replace' use 4 or 8)
+const bankQuantity = 4; // total number of banks ranging from 3-8 (for 'top' or 'top-replace' use either 4 or 8)
 const optionHidePresetButtons = false; // true, false
 const optionHideDisplayAll = true; // true, false
 const optionSaveAntenna = (!!document.getElementById('data-ant')); // (!!document.getElementById('data-ant')), true, false
 const optionAntennaDisplay = 'number'; // number, letter
+const optionHighlightSelectedPreset = true; // true, false
 const displayDefaultLogo = true; // true, false
 const enableDefaultLogo = 'unnamed'; // all, named, unnamed
 const infoIcon = true; // true, false
@@ -50,7 +51,7 @@ const defaultPresetData = {
 
 */
 
-const pluginVersion = '1.3.3';
+const pluginVersion = '1.3.4';
 const pluginName = "Preset Buttons";
 const pluginHomepageUrl = "https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets";
 const pluginUpdateUrl = "https://raw.githubusercontent.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets/refs/heads/main/ButtonPresets/pluginButtonPresets.js";
@@ -59,6 +60,14 @@ const CHECK_FOR_UPDATES = true;
 
 // Initial value
 let bankDisplayAll = false;
+
+// Global variables for keyboard preset navigation
+let currentPresetIndex = 0; // (0-9)
+let currentPresetBank = 'A'; // Preset bank
+let frequencyObserver; // MutationObserver for frequency changes
+let lastUsedPreset = null; // Smart highlighting
+let keysPressed = new Set(); // Track which keys are currently pressed
+let hasUsedKeyboardNavigation = false; // Track if keyboard navigation has been used
 
 // Create default logo
 let defaultButtonPresetImagePath = ' data:image/webp;base64,UklGRpQEAABXRUJQVlA4TIgEAAAvP8APEBXRkf/Pbd1c5R2FR8FRcBQcBUdBKWdlqdvR7v4ZVDv8lMXKgT0652z3QEnVL5RK/Ds8OBsFR5EDdM6JPUf9dhRQeegcqCyCM1RW9ypns2LnNpJkV5n8o/ghYGqY89DCw5yfidPYtq1ml85zyPwTeSaKEpD7dnLoxCDANKGEEkooRznKUW4yBm4bKUr3aPnuBv6A+xnIAXlQAStgbFCZTTjUYp2Kdebxx8XMiJk61R9RxgL6TWGBasOBCiDPHRidErVrxjMnZkHkmXdyrOqxhg1V26qpWJBc4sFqd20x65lXX398uvoaTq42SHkFz+Apbm4JTF8rX66BuoCXFBYYgJ3xyvPq741PP5WERMbTd7QCBHxXqPJd1fiPkdcaO1m+svr748ynq7+BmZOEmcPwXv+EoXF0SiDAhig8uDlQRY5YtFa6XF0ETPjM+ueLM2c4OZeWqqVSN2f7ShiuPobV22A6MeK9ZarqVu2UYFEnnFg0gN9XdXUg5c3XGx99dIVdM8+BqFTVGZrwbg+2mdtApn3aDKgPjbFrdLy25c3/HXbLkOsycGR2RR7JBZTVtGW23X082GaOkKpl4FWzantiPL2xokSViN9ixHYWeIy8UVteryR2GkDWcGFc2P2DRgZgDizLNnMuQtSXCDjAqjFPr9qcmLrCxvBoxEcQFZIBcCS5sv55o8nqvtHPNfUbqgzDb1dvD0yXrPAdekPzh7mteI1HnGRoEJN4lzdfd5r8rmakZXQawG2zbWpcXWCx0Gw79pacZKzw2k7ilgUG6jlCNOOlK7MAaORl1QAs1XYzXb0JwwA2SH2Nx2J0JE85ICAW63pJG+NXJPvlMy8t8U4g62sURU5NrW2mU7OPvGCGfZKhAwYEWPVMkZGWiSIl1+KA7x8oyMWqVnT071lEqJs//jBixoDgMo9GbGV0loG2IgAGigNlzHkABMOfZQPZhw2GVa0QMyE8p3NA40oi2a/ezgcAv9C/aG9otuDpAt/pRIovgMd0vstrJ6qEVTU0OmVPp7fiw3dY0E70Yat0CbQuOkWm8zcZdqHSRO3qJrJrFWmZieoKMVcAwaWERzwhHzrCHEiz2141duu3lN0eQaw53hhdhQsGYq8cj3gn8ac68Zt2NX6Tmm1T0yJ+M4Bm90MHBGCnRMy6DN+R3/M8Lz18JbGqK/tt4OUruuT9HAhib8lKXL2yfj8mESneyc0mtxarixtuXoaoT76vmqujxR3F88CAxq1kS9w6w63nUFaBHre65HfsBxbM038YPXI6ZZiTq8B3NCROuClLMulRolSPmx3Af4X8xuwtY1zdWCNOndIjgD4432+DELf5zEdnrvCsPQ16URBMWismPKVFPezVfoQPILtta/zKaYdURbKcOfMpMydSzDe1zHMuIzafH6gha5LIH0+Yz3wqFTKTvKWlnUir2xtXTawlrr0AcMQzy7z6G2jeDFfM210AcCBVpK2KVX39pwCIuj/NmGjWSrMyebmooxbZYAEjYOfHIHKqvczjj4uZvXjxhVP7QTX/zTe3cP8CAQ==';
@@ -75,6 +84,18 @@ styleButtonPresets.innerHTML = `
 
 #plugin-button-presets button:hover {
   transition: 0.3s ease background-color;
+}
+
+/* Active preset highlight */
+#plugin-button-presets button.preset-active {
+  background-color: var(--color-2-transparent) !important;
+  outline: 2px solid var(--color-5-transparent) !important;
+  outline-offset: 0;
+  box-shadow: 0 0 10px var(--color-3-transparent);
+}
+
+#plugin-button-presets button.preset-active:hover {
+  background-color: var(--color-4) !important;
 }
 
 #plugin-button-presets button img {
@@ -368,6 +389,7 @@ dropdownOptions.addEventListener('click', function(event) {
     dropdownInput.value = `${bankName} ${currentBank}`; // Bank text
     updateButtons(); // Update the buttons when the bank changes
     dropdownOptions.classList.remove('opened');
+    setTimeout(highlightActivePreset, 100);
   }
 });
 
@@ -656,9 +678,10 @@ function updateButtons() {
     let tooltipValues = storedData.tooltips || [];
 
     for (let i = 0; i < 10; i++) {
-      (function(index) {
+      (function(index, buttonBank) {
         let button = document.createElement("button");
-        button.id = `setFrequencyButton${index}`;
+        const buttonId = bankDisplayAll ? `setFrequencyButton${buttonBank}${index}` : `setFrequencyButton${index}`;
+        button.id = buttonId; // Create unique IDs for "Show All Presets"
         button.classList.add('tooltip-presets', 'tooltip-presets-once');
         button.setAttribute('data-tooltip', tooltipValues[index] || psValues[index]); // Tooltip uses data-station-name if available, otherwise psValue
         button.style.minWidth = "60px";
@@ -673,12 +696,19 @@ function updateButtons() {
             let commandInput = document.getElementById('commandinput');
             const presetInput = buttonValues[index];
             const antennaInput = antennaValues[index];
-            
+
             if (socket.readyState === WebSocket.OPEN) {
               socket.send("T" + (Math.round((presetInput).toFixed(3) * 1000)));
               if (optionSaveAntenna && antennaInput) socket.send("Z" + antennaInput);
             }
+
+            // Update current preset tracking for keyboard navigation
+            currentPresetIndex = index;
+            currentPresetBank = buttonBank;
+            lastUsedPreset = {bank: buttonBank, index: index};
             checkBankASum();
+
+            setTimeout(highlightActivePreset, 200);
           });
           
           button.addEventListener('contextmenu', function(e) {
@@ -766,12 +796,19 @@ function updateButtons() {
             let commandInput = document.getElementById('commandinput');
             const presetInput = buttonValues[index];
             const antennaInput = antennaValues[index];
-            
+
             if (socket.readyState === WebSocket.OPEN) {
               socket.send("T" + (Math.round((presetInput).toFixed(3) * 1000)));
               if (optionSaveAntenna && antennaInput) socket.send("Z" + antennaInput);
             }
+
+            // Update current preset tracking for keyboard shortcuts
+            currentPresetIndex = index;
+            currentPresetBank = buttonBank;
+            lastUsedPreset = {bank: buttonBank, index: index};
             checkBankASum();
+
+            setTimeout(highlightActivePreset, 10);
           }
         }
         
@@ -1058,15 +1095,398 @@ function updateButtons() {
         }
         
         buttonContainer.appendChild(button);
-      })(i);
+      })(i, currentBank);
     } // i
   } // iAll
   createImportExportButtons();
+
+  // Highlight if lastUsedPreset and correct bank
+  if (!lastUsedPreset || (lastUsedPreset && lastUsedPreset.bank === currentBank)) {
+    setTimeout(highlightActivePreset, 200);
+  }
 }
 
 // Set default bank to A and update buttons on load
 currentBank = 'A';
 updateButtons();
+
+// Keyboard preset navigation
+startFrequencyMonitoring();
+
+// Function to initialise keyboard navigation from highlighted preset on page load
+function initialiseKeyboardNavigation() {
+  const container = document.getElementById('plugin-button-presets');
+  if (!container) {
+    setTimeout(initialiseKeyboardNavigation, 100);
+    return;
+  }
+
+  const initializeFromHighlighted = () => {
+    const highlightedButtons = container.querySelectorAll('button.preset-active');
+
+    if (highlightedButtons.length > 0) {
+      // Use first highlighted button if multiple exist
+      const firstHighlighted = highlightedButtons[0];
+      const buttonId = firstHighlighted.id;
+
+      if (bankDisplayAll) {
+        // In "Show All Presets" mode, extract bank and index from ID
+        const match = buttonId.match(/setFrequencyButton([A-Z])(\d+)/);
+        if (match) {
+          currentPresetBank = match[1];
+          currentPresetIndex = parseInt(match[2]);
+          console.log(`[${pluginName}] Keyboard navigation initialised from highlighted preset: ${currentPresetBank}${currentPresetIndex + 1}`);
+        }
+      } else {
+        // In single bank mode, extract index from ID
+        const match = buttonId.match(/setFrequencyButton(\d+)/);
+        if (match) {
+          currentPresetIndex = parseInt(match[1]);
+          currentPresetBank = currentBank;
+          console.log(`[${pluginName}] Keyboard navigation initialised from highlighted preset: ${currentPresetBank}${currentPresetIndex + 1}`);
+        }
+      }
+      return true; // Success
+    }
+    return false; // No highlighted presets found
+  };
+
+  const waitForButtons = () => {
+    const allButtons = container.querySelectorAll('button');
+    if (allButtons.length === 0) {
+      setTimeout(waitForButtons, 50);
+      return;
+    }
+
+    if (initializeFromHighlighted()) {
+      return; // Found highlighting
+    }
+
+    const observer = new MutationObserver(() => {
+      if (initializeFromHighlighted()) {
+        observer.disconnect();
+      }
+    });
+
+    observer.observe(container, {
+      attributes: true,
+      attributeFilter: ['class'],
+      subtree: true
+    });
+
+    setTimeout(() => {
+      observer.disconnect();
+    }, 2000);
+  };
+
+  waitForButtons();
+}
+
+initialiseKeyboardNavigation();
+
+// Function to get all visible presets in order
+function getAllVisiblePresets() {
+  const presets = [];
+
+  if (bankDisplayAll) {
+    // In "Show All Presets" mode, collect presets from all banks
+    for (let bankIndex = 0; bankIndex < bankQuantity; bankIndex++) {
+      const bank = bankNames[bankIndex];
+      const storedData = getStoredData(bank);
+      const buttonValues = storedData.values || [];
+
+      for (let presetIndex = 0; presetIndex < 10; presetIndex++) {
+        presets.push({
+          bank: bank,
+          index: presetIndex,
+          frequency: buttonValues[presetIndex] || 87.5,
+          buttonId: `setFrequencyButton${bank}${presetIndex}`
+        });
+      }
+    }
+  } else {
+    // In single bank mode, only current bank presets
+    const storedData = getStoredData(currentBank);
+    const buttonValues = storedData.values || [];
+
+    for (let presetIndex = 0; presetIndex < 10; presetIndex++) {
+      presets.push({
+        bank: currentBank,
+        index: presetIndex,
+        frequency: buttonValues[presetIndex] || 87.5,
+        buttonId: `setFrequencyButton${presetIndex}`
+      });
+    }
+  }
+
+  return presets;
+}
+
+// Find current preset position
+function getCurrentPresetPosition() {
+  const allPresets = getAllVisiblePresets();
+
+  for (let i = 0; i < allPresets.length; i++) {
+    if (allPresets[i].bank === currentPresetBank && allPresets[i].index === currentPresetIndex) {
+      return i;
+    }
+  }
+
+  return 0; // Default if not found
+}
+
+// Function to get next preset
+function getNextPreset() {
+  const allPresets = getAllVisiblePresets();
+  const currentPosition = getCurrentPresetPosition();
+  const nextPosition = (currentPosition + 1) % allPresets.length;
+  return allPresets[nextPosition];
+}
+
+// Function to get previous preset
+function getPreviousPreset() {
+  const allPresets = getAllVisiblePresets();
+  const currentPosition = getCurrentPresetPosition();
+  const prevPosition = (currentPosition - 1 + allPresets.length) % allPresets.length;
+  return allPresets[prevPosition];
+}
+
+// Function to recall preset by index
+function recallPresetByIndex(index) {
+  const storedData = getStoredData(currentBank);
+  const buttonValues = storedData.values;
+  const antennaValues = storedData.antennas || [];
+
+  if (buttonValues && buttonValues[index] !== undefined) {
+    const presetInput = buttonValues[index];
+    const antennaInput = antennaValues[index];
+
+    if (socket.readyState === WebSocket.OPEN) {
+      socket.send("T" + (Math.round((presetInput).toFixed(3) * 1000)));
+      if (optionSaveAntenna && antennaInput) socket.send("Z" + antennaInput);
+    }
+
+    currentPresetIndex = index;
+    checkBankASum();
+
+    console.log(`[${pluginName}] Keyboard shortcut:`, presetInput, currentBank, (index + 1));
+  }
+}
+
+// Function to navigate to next preset
+function navigateToNextPreset() {
+  if (!hasUsedKeyboardNavigation) {
+    // Check if any preset is highlighted
+    const highlightedPresets = document.querySelectorAll('#plugin-button-presets button.preset-active');
+
+    if (highlightedPresets.length === 0) {
+      hasUsedKeyboardNavigation = true;
+      const currentPreset = {
+        bank: currentPresetBank,
+        index: currentPresetIndex,
+        buttonId: bankDisplayAll ? `setFrequencyButton${currentPresetBank}${currentPresetIndex}` : `setFrequencyButton${currentPresetIndex}`
+      };
+      recallPreset(currentPreset);
+      return;
+    } else {
+      hasUsedKeyboardNavigation = true;
+    }
+  }
+
+  const nextPreset = getNextPreset();
+  recallPreset(nextPreset);
+}
+
+// Function to navigate to previous preset
+function navigateToPreviousPreset() {
+  if (!hasUsedKeyboardNavigation) {
+    // Check if any preset is highlighted
+    const highlightedPresets = document.querySelectorAll('#plugin-button-presets button.preset-active');
+
+    if (highlightedPresets.length === 0) {
+      hasUsedKeyboardNavigation = true;
+      const currentPreset = {
+        bank: currentPresetBank,
+        index: currentPresetIndex,
+        buttonId: bankDisplayAll ? `setFrequencyButton${currentPresetBank}${currentPresetIndex}` : `setFrequencyButton${currentPresetIndex}`
+      };
+      recallPreset(currentPreset);
+      return;
+    } else {
+      hasUsedKeyboardNavigation = true;
+    }
+  }
+
+  const prevPreset = getPreviousPreset();
+  recallPreset(prevPreset);
+}
+
+// Function to recall preset by preset object
+function recallPreset(preset) {
+  const storedData = getStoredData(preset.bank);
+  const buttonValues = storedData.values;
+  const antennaValues = storedData.antennas || [];
+
+  if (buttonValues && buttonValues[preset.index] !== undefined) {
+    const presetInput = buttonValues[preset.index];
+    const antennaInput = antennaValues[preset.index];
+
+    if (socket.readyState === WebSocket.OPEN) {
+      socket.send("T" + (Math.round((presetInput).toFixed(3) * 1000)));
+      if (optionSaveAntenna && antennaInput) socket.send("Z" + antennaInput);
+    }
+
+    // Update current preset tracking
+    currentPresetIndex = preset.index;
+    currentPresetBank = preset.bank;
+    lastUsedPreset = {bank: preset.bank, index: preset.index};
+    checkBankASum();
+
+    const dataFrequencyElement = document.getElementById('data-frequency');
+    if (!dataFrequencyElement) return;
+    const currentFrequency = parseFloat(dataFrequencyElement.textContent) || 0;
+
+    if (currentFrequency === presetInput) setTimeout(highlightActivePreset, 10);
+
+    console.log(`[${pluginName}] Keyboard shortcut:`, presetInput, preset.bank, (preset.index + 1));
+  }
+}
+
+// Function to highlight preset that matches current frequency
+function highlightActivePreset() {
+  const dataFrequencyElement = document.getElementById('data-frequency');
+  if (!optionHighlightSelectedPreset || !dataFrequencyElement) return;
+
+  const currentFrequency = parseFloat(dataFrequencyElement.textContent) || 0;
+
+  // Remove existing active class from all buttons
+  const allButtons = document.querySelectorAll('#plugin-button-presets button');
+  allButtons.forEach(btn => btn.classList.remove('preset-active'));
+
+  // Highlight correct preset
+  if (lastUsedPreset) {
+    const lastPresetData = getStoredData(lastUsedPreset.bank);
+    if (lastPresetData.values && lastPresetData.values[lastUsedPreset.index] !== undefined) {
+      const lastPresetFreq = parseFloat(lastPresetData.values[lastUsedPreset.index]) || 0;
+
+      if (Math.abs(currentFrequency - lastPresetFreq) < 0.001) {
+        const buttonId = bankDisplayAll ?
+          `setFrequencyButton${lastUsedPreset.bank}${lastUsedPreset.index}` :
+          `setFrequencyButton${lastUsedPreset.index}`;
+        const button = document.getElementById(buttonId);
+        if (button) {
+          button.classList.add('preset-active');
+        }
+        return; // Exit early
+      }
+    }
+  }
+
+  // Highlight all matching presets if no last used preset matched current frequency
+  if (bankDisplayAll) {
+    // In "Show All Presets" mode, check all banks
+    for (let bankIndex = 0; bankIndex < bankQuantity; bankIndex++) {
+      const bank = bankNames[bankIndex];
+      const storedData = getStoredData(bank);
+      const buttonValues = storedData.values || [];
+
+      for (let i = 0; i < buttonValues.length && i < 10; i++) {
+        const presetFreq = parseFloat(buttonValues[i]) || 0;
+
+        // Check if frequencies match
+        if (Math.abs(currentFrequency - presetFreq) < 0.001) {
+          const button = document.getElementById(`setFrequencyButton${bank}${i}`);
+          if (button) {
+            button.classList.add('preset-active');
+          }
+        }
+      }
+    }
+  } else {
+    // Only check current bank in single bank mode
+    const storedData = getStoredData(currentBank);
+    const buttonValues = storedData.values || [];
+
+    for (let i = 0; i < buttonValues.length && i < 10; i++) {
+      const presetFreq = parseFloat(buttonValues[i]) || 0;
+
+      // Check if frequencies match (with small tolerance for floating point comparison)
+      if (Math.abs(currentFrequency - presetFreq) < 0.001) {
+        const button = document.getElementById(`setFrequencyButton${i}`);
+        if (button) {
+          button.classList.add('preset-active');
+        }
+      }
+    }
+  }
+}
+
+// Function to monitor frequency
+function startFrequencyMonitoring() {
+  // Disconnect any existing observer
+  if (frequencyObserver) {
+    frequencyObserver.disconnect();
+  }
+
+  const dataFrequencyElement = document.getElementById('data-frequency');
+  if (!dataFrequencyElement) {
+    setTimeout(startFrequencyMonitoring, 1000);
+    return;
+  }
+
+  frequencyObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'childList' || mutation.type === 'characterData') {
+        setTimeout(highlightActivePreset, 0);
+      }
+    });
+  });
+
+  frequencyObserver.observe(dataFrequencyElement, {
+    childList: true,
+    subtree: true,
+    characterData: true
+  });
+
+  highlightActivePreset();
+}
+
+// Global keyboard event listener for preset navigation
+document.addEventListener('keydown', function(e) {
+  const activeElement = document.activeElement;
+  const isInputFocused = activeElement && (
+    activeElement.tagName === 'INPUT' ||
+    activeElement.tagName === 'TEXTAREA' ||
+    activeElement.contentEditable === 'true'
+  );
+
+  if (!isInputFocused) {
+    // Next preset
+    if (e.key === ']') {
+      if (!keysPressed.has(']')) {
+        keysPressed.add(']');
+        e.preventDefault();
+        navigateToNextPreset();
+      }
+    }
+    // Previous preset
+    else if (e.key === '[') {
+      if (!keysPressed.has('[')) {
+        keysPressed.add('[');
+        e.preventDefault();
+        navigateToPreviousPreset();
+      }
+    }
+  }
+});
+
+// Global keyboard event listener for key release
+document.addEventListener('keyup', function(e) {
+  // Clear key from pressed set when released
+  if (e.key === ']' || e.key === '[') {
+    keysPressed.delete(e.key);
+  }
+});
 
 // Find the container to insert the button container after
 const container = document.querySelector('.wrapper-outer #wrapper .flex-container') || document.querySelector('#wrapper-outer #wrapper .flex-container');
@@ -1143,7 +1563,7 @@ function toggleButtonContainer(statusToast) {
 }
 
 // Initial tooltip
-function oncePresetTooltips() {
+function initTooltipsOnce() {
   let tooltipText;
   $('.tooltip-presets-once').hover(function(e) {
     // Never display again after first click
@@ -1152,6 +1572,7 @@ function oncePresetTooltips() {
     if (!document.querySelector('.tooltip-presets-once')) { return; }
     if (!/Mobi|Android|iPhone|iPad|iPod|Opera Mini/i.test(navigator.userAgent)) {
       tooltipText = `
+            <strong><i>[</i></strong> and <strong><i>]</i></strong> to navigate through the presets.<br>
             <strong><i>Left-click</i></strong> or <strong><i>ENTER</i></strong> to recall the preset.<br>
             <strong><i>Right-click</i></strong>, <strong><i>CTRL+click</i></strong>, or <strong><i>SHIFT+S</i></strong> to store the preset.<br>
             <strong><i>Middle-click</i></strong> or <strong><i>SHIFT+click</i></strong>, or <strong><i>SHIFT+R</i></strong> to reset the preset.<br>
@@ -1257,6 +1678,7 @@ function AdditionalCheckboxesDisplayAll() { // ########## SHOW ALL PRESET BUTTON
           console.log(`[${pluginName}] buttonPresetsDisplayAll = true`);
         }
         checkImageErrors();
+        initTooltipsOnce();
     }
 
     // Create a MutationObserver instance
@@ -1336,7 +1758,7 @@ if (!optionHidePresetButtons) {
   AdditionalCheckboxesButtonPresets();
 }
 
-oncePresetTooltips();
+if (optionHideDisplayAll) initTooltipsOnce();
 
 // Function to check if all preset values in bank A add up to 875
 function checkBankASum() {

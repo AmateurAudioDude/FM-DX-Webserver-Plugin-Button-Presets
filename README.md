@@ -13,6 +13,12 @@ This plugin allows locally-stored frequency presets, displayed below general FM-
 
 ![popup](https://github.com/user-attachments/assets/ad910fdb-ae7d-4b4c-aea4-9e6acfd13b56)
 
+v1.3.4
+------
+* Added option to highlight currently tuned preset
+* Added keyboard shortcuts `[` and `]` to navigate visible presets
+* Fixed frozen tooltip when "Show All Presets" option is available
+
 v1.3.3
 ------
 * Stores/recalls antenna setting if applicable
