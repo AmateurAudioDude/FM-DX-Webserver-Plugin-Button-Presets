@@ -1423,6 +1423,7 @@ function highlightActivePreset() {
 
 // Function to monitor frequency
 function startFrequencyMonitoring() {
+  const monitorEveryFrequencyChange = true;
   // Disconnect any existing observer
   if (frequencyObserver) {
     frequencyObserver.disconnect();
@@ -1437,7 +1438,10 @@ function startFrequencyMonitoring() {
   frequencyObserver = new MutationObserver(function(mutations) {
     mutations.forEach(function(mutation) {
       if (mutation.type === 'childList' || mutation.type === 'characterData') {
-        setTimeout(highlightActivePreset, 0);
+        setTimeout(() => {
+          highlightActivePreset();
+          if (monitorEveryFrequencyChange) updateKeyboardNavigationPosition();
+        }, 0);
       }
     });
   });
@@ -1449,6 +1453,33 @@ function startFrequencyMonitoring() {
   });
 
   highlightActivePreset();
+}
+
+// Function to update keyboard navigation position based on highlighted presets
+function updateKeyboardNavigationPosition() {
+  const highlightedButtons = document.querySelectorAll('#plugin-button-presets button.preset-active');
+
+  if (highlightedButtons.length > 0) {
+    // Use the first highlighted button if multiple exist
+    const firstHighlighted = highlightedButtons[0];
+    const buttonId = firstHighlighted.id;
+
+    if (bankDisplayAll) {
+      // In "Show All Presets" mode, extract bank and index from ID
+      const match = buttonId.match(/setFrequencyButton([A-Z])(\d+)/);
+      if (match) {
+        currentPresetBank = match[1];
+        currentPresetIndex = parseInt(match[2]);
+      }
+    } else {
+      // In single bank mode, extract index from ID
+      const match = buttonId.match(/setFrequencyButton(\d+)/);
+      if (match) {
+        currentPresetIndex = parseInt(match[1]);
+        currentPresetBank = currentBank;
+      }
+    }
+  }
 }
 
 // Global keyboard event listener for preset navigation
