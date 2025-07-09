@@ -40,11 +40,13 @@ const defaultPresetData = {
 
 /*
 
-  defaultPresetData examples:
-  
-  "antennas" is optional:
-  0 = antenna 1, 1 = antenna 2, 2 = antenna 3, 3 = antenna 4.
+  defaultPresetData:
 
+  "antennas" is an optional parameter:
+  '0' = Antenna 1, '1' = Antenna 2, '2' = Antenna 3, '3' = Antenna 4.
+
+  Examples:
+  
   values: [99.7, ...
   antennas: ['0', ...
   names: ['Example', ...
