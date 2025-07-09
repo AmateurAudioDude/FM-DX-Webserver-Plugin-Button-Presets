@@ -31,6 +31,7 @@ const enableDefaultLogo = 'unnamed'; // all, named, unnamed
 const infoIcon = true; // true, false
 const defaultPresetData = {
   values: [87.5, 87.5, 87.5, 87.5, 87.5, 87.5, 87.5, 87.5, 87.5, 87.5],
+  antennas: ['', '', '', '', '', '', '', '', '', ''],
   names: ['', '', '', '', '', '', '', '', '', ''],
   urls: ['', '', '', '', '', '', '', '', '', '']
 };
@@ -40,12 +41,17 @@ const defaultPresetData = {
 /*
 
   defaultPresetData examples:
+  
+  "antennas" is optional:
+  0 = antenna 1, 1 = antenna 2, 2 = antenna 3, 3 = antenna 4.
 
   values: [99.7, ...
+  antennas: ['0', ...
   names: ['Example', ...
   urls: ['/logos/Example.png', ...
 
   values: [99.7, ...
+  antennas: ['0', ...
   names: ['Example', ...
   urls: ['https://tef.noobish.eu/logos/EXA/Example.png', ...
 
@@ -319,7 +325,7 @@ function getStoredData(bank) {
   const key = `buttonPresets${bank}`;
   let dataButtonPresets;
   if (bank === "A") {
-    dataButtonPresets = JSON.parse(localStorage.getItem(key)) || { values: [...defaultPresetData.values], antennas: Array(10).fill(''), ps: [...defaultPresetData.names], images: [...defaultPresetData.urls] };
+    dataButtonPresets = JSON.parse(localStorage.getItem(key)) || { values: [...defaultPresetData.values], antennas: [...defaultPresetData.antennas], ps: [...defaultPresetData.names], images: [...defaultPresetData.urls] };
   } else {
     dataButtonPresets = JSON.parse(localStorage.getItem(key)) || { values: Array(10).fill(87.5), antennas: Array(10).fill(''), ps: Array(10).fill(''), images: Array(10).fill('') };
   }
