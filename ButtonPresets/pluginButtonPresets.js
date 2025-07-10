@@ -1859,6 +1859,7 @@ function executeInfoCode() {
     const newContent = `<p style="text-align: center;"><i>This feature allows you to store up to ${bankQuantity * 10} presets, with 10 presets per bank.
     To store a frequency:</i>
 
+    <strong><i>[</i></strong> and <strong><i>]</i></strong> to navigate through the presets.
     <strong><i>Left-click</i></strong> or <strong><i>ENTER</i></strong> to recall the preset.
     <strong><i>Right-click</i></strong>, <strong><i>CTRL+click</i></strong>, or <strong><i>SHIFT+S</i></strong> to store the preset.
     <strong><i>Middle-click</i></strong>, <strong><i>SHIFT+click</i></strong>, or <strong><i>SHIFT+R</i></strong> to reset the preset.
