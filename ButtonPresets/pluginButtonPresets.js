@@ -707,7 +707,7 @@ function updateButtons() {
 
             if (socket.readyState === WebSocket.OPEN) {
               socket.send("T" + (Math.round((presetInput).toFixed(3) * 1000)));
-              if (optionSaveAntenna && antennaInput) socket.send("Z" + antennaInput);
+              if (optionSaveAntenna && antennaInput && antennaInput !== getCurrentAntennaValue()) socket.send("Z" + antennaInput);
             }
 
             // Update current preset tracking for keyboard navigation
@@ -807,7 +807,7 @@ function updateButtons() {
 
             if (socket.readyState === WebSocket.OPEN) {
               socket.send("T" + (Math.round((presetInput).toFixed(3) * 1000)));
-              if (optionSaveAntenna && antennaInput) socket.send("Z" + antennaInput);
+              if (optionSaveAntenna && antennaInput && antennaInput !== getCurrentAntennaValue()) socket.send("Z" + antennaInput);
             }
 
             // Update current preset tracking for keyboard shortcuts
@@ -1271,7 +1271,7 @@ function recallPresetByIndex(index) {
 
     if (socket.readyState === WebSocket.OPEN) {
       socket.send("T" + (Math.round((presetInput).toFixed(3) * 1000)));
-      if (optionSaveAntenna && antennaInput) socket.send("Z" + antennaInput);
+      if (optionSaveAntenna && antennaInput && antennaInput !== getCurrentAntennaValue()) socket.send("Z" + antennaInput);
     }
 
     currentPresetIndex = index;
@@ -1341,7 +1341,7 @@ function recallPreset(preset) {
 
     if (socket.readyState === WebSocket.OPEN) {
       socket.send("T" + (Math.round((presetInput).toFixed(3) * 1000)));
-      if (optionSaveAntenna && antennaInput) socket.send("Z" + antennaInput);
+      if (optionSaveAntenna && antennaInput && antennaInput !== getCurrentAntennaValue()) socket.send("Z" + antennaInput);
     }
 
     // Update current preset tracking
