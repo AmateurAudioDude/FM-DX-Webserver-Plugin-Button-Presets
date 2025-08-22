@@ -2219,5 +2219,3 @@ function checkUpdate(setupOnly, pluginVersion, pluginName, urlUpdateLink, urlFet
 if (CHECK_FOR_UPDATES) checkUpdate(pluginSetupOnlyNotify, pluginVersion, pluginName, pluginHomepageUrl, pluginUpdateUrl);
 
 })();
-
-
