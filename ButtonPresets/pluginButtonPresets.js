@@ -437,6 +437,7 @@ function replacePresets() {
         let newContainer1, newContainer2;
         if (!replaceOriginals && originalContainer && parentNode) {
             newContainer1 = document.createElement('div');
+            newContainer1.classList.add('flex-center', 'flex-phone');
             newContainer1.style.display = 'flex';
             newContainer1.style.flexWrap = 'wrap';
             newContainer1.style.maxWidth = originalContainer.style.width || '100%';
@@ -444,6 +445,7 @@ function replacePresets() {
 
             if (bankQuantity === 8) {
                 newContainer2 = document.createElement('div');
+                newContainer2.classList.add('flex-center', 'flex-phone');
                 newContainer2.style.display = 'flex';
                 newContainer2.style.flexWrap = 'wrap';
                 newContainer2.style.maxWidth = originalContainer.style.width || '100%';
@@ -2216,3 +2218,4 @@ function checkUpdate(setupOnly, pluginVersion, pluginName, urlUpdateLink, urlFet
 if (CHECK_FOR_UPDATES) checkUpdate(pluginSetupOnlyNotify, pluginVersion, pluginName, pluginHomepageUrl, pluginUpdateUrl);
 
 })();
+
