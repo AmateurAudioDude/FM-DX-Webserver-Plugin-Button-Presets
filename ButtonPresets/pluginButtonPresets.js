@@ -469,6 +469,7 @@ function replacePresets() {
 
                     if (bankQuantity === 8 && originalContainer && parentNode && !newContainer1) {
                         newContainer1 = document.createElement('div');
+                        newContainer1.classList.add('flex-center', 'flex-phone');
                         newContainer1.style.display = 'flex';
                         newContainer1.style.flexWrap = 'wrap';
                         newContainer1.style.maxWidth = originalContainer.style.width || '100%';
@@ -2218,4 +2219,5 @@ function checkUpdate(setupOnly, pluginVersion, pluginName, urlUpdateLink, urlFet
 if (CHECK_FOR_UPDATES) checkUpdate(pluginSetupOnlyNotify, pluginVersion, pluginName, pluginHomepageUrl, pluginUpdateUrl);
 
 })();
+
 
