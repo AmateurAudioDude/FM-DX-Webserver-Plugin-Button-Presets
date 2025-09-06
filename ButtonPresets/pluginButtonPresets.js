@@ -420,11 +420,7 @@ function replacePresets() {
             preset8: { bank: "H", label: `${bankName} H` }
         };
 
-        if (bankMenuLocation === 'top-replace') {
-            replaceOriginals = true;
-        } else {
-            replaceOriginals = false;
-        }
+        replaceOriginals = bankMenuLocation === 'top-replace' && localStorage.getItem('preset1') && localStorage.getItem('preset1') !== 'null';
 
         // Get parent of existing buttons
         const firstButton = document.querySelector('#dashboard-panel-description .flex-container .flex-center #preset1');
