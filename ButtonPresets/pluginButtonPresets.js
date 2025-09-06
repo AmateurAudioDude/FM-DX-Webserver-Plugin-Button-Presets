@@ -1984,9 +1984,25 @@ function exportLocalStorageToFile() {
   const blob = new Blob([jsonData], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
 
+  // Fetch server name to include in filename
+  const tunerNameEl = document.querySelector(
+    ".wrapper-outer.dashboard-panel .panel-100-real #tuner-name.text-left"
+  );
+
+  let tunerName = Date.now();
+
+  if (tunerNameEl) {
+    tunerName = tunerNameEl.textContent.trim();
+    tunerName = tunerName.replace(/\s+/g, "_");
+    tunerName = tunerName.replace(/[^a-zA-Z0-9]/g, "_");
+    tunerName = tunerName.replace(/_+/g, "_");
+    tunerName = tunerName.replace(/^_+|_+$/g, "");
+    tunerName = tunerName.slice(0, 32);
+  }
+
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'FM-DX_Webserver_Presets.json';
+  a.download = 'FM-DX_Webserver_Presets_-_' + tunerName + '.json';
   a.style.display = 'none';  // Hide the link
   document.body.appendChild(a);
   a.click();
