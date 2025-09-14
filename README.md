@@ -9,9 +9,19 @@ This plugin allows locally-stored frequency presets, displayed below general FM-
 * Restart FM-DX Webserver if required
 * Login to Adminstrator Panel and enable plugin
 
+> [!IMPORTANT]
+> When updating from a previous version, make sure to copy your settings to a text editor beforehand so you can easily paste them after the update. Also, ensure that the new setting `allowCustomFont` is included.
+
 #### Configuration options found in `pluginButtonPresets.js`
 
 ![popup](https://github.com/user-attachments/assets/ad910fdb-ae7d-4b4c-aea4-9e6acfd13b56)
+
+v1.3.5
+------
+* Added option to support/deny any custom fonts used
+* Exporting presets filename now includes Webserver name.
+* Fixed default menu location positioning for mobile (portrait)
+* Fixed antenna command being sent on recall only when required
 
 v1.3.4
 ------

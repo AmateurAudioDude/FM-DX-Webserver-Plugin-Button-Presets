@@ -1,5 +1,5 @@
 /*
-    Preset Buttons v1.3.4 by AAD
+    Preset Buttons v1.3.5 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -60,7 +60,7 @@ const defaultPresetData = {
 
 */
 
-const pluginVersion = '1.3.4';
+const pluginVersion = '1.3.5';
 const pluginName = "Preset Buttons";
 const pluginHomepageUrl = "https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets";
 const pluginUpdateUrl = "https://raw.githubusercontent.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets/refs/heads/main/ButtonPresets/pluginButtonPresets.js";
