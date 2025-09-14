@@ -29,6 +29,7 @@ const optionHighlightSelectedPreset = true; // true, false
 const displayDefaultLogo = true; // true, false
 const enableDefaultLogo = 'unnamed'; // all, named, unnamed
 const infoIcon = true; // true, false
+const allowCustomFont = 'default'; // default, true, false
 const defaultPresetData = {
   values: [87.5, 87.5, 87.5, 87.5, 87.5, 87.5, 87.5, 87.5, 87.5, 87.5],
   antennas: ['', '', '', '', '', '', '', '', '', ''],
@@ -2143,6 +2144,29 @@ function createImportExportButtons() {
 
 // Call function to create and append import/export buttons
 createImportExportButtons();
+
+// Code if a custom font is used
+document.addEventListener("DOMContentLoaded", function () {
+    if (allowCustomFont == 'true') {
+        setTimeout(() => {
+            updateButtons();
+        }, 100);
+        setTimeout(() => {
+            updateButtons();
+        }, 1000);
+    } else if (allowCustomFont == 'false') {
+        const defaultFont = `'Roboto Mono', monospace`;
+        $(document).on('mousedown mouseup', function() {
+            setTimeout(() => {
+                $('#plugin-button-presets .button-text').css({
+                    'font-family': defaultFont
+                });
+            }, 10);
+        });
+    } else {
+        // Default
+    }
+});
 
 // Function for update notification in /setup
 function checkUpdate(setupOnly, pluginVersion, pluginName, urlUpdateLink, urlFetchLink) {
