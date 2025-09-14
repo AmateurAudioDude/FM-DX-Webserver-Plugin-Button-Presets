@@ -19,7 +19,7 @@ This plugin allows locally-stored frequency presets, displayed below general FM-
 v1.3.5
 ------
 * Added option to support/deny any custom fonts used
-* Exporting presets filename now includes Webserver name.
+* Exporting presets filename now includes Webserver name
 * Fixed default menu location positioning for mobile (portrait)
 * Fixed antenna command being sent on recall only when required
 
