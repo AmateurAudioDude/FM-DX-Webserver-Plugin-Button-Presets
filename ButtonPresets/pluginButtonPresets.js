@@ -122,6 +122,7 @@ styleButtonPresets.innerHTML = `
   position: relative;
   flex-grow: .1;
   margin: 0 4px;
+  overflow: hidden;
 }
 
 .tooltip-presets::after {
@@ -143,7 +144,6 @@ styleButtonPresets.innerHTML = `
   text-align: center;
   font-size: 14px;
   z-index: 1;
-  
 }
 
 .tooltip-presets:hover::after {
