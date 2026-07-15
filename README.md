@@ -16,6 +16,10 @@ This plugin allows locally-stored frequency presets, displayed below general FM-
 
 ![popup](https://github.com/user-attachments/assets/ad910fdb-ae7d-4b4c-aea4-9e6acfd13b56)
 
+v1.3.6
+------
+* Added left/right navigation arrows to preset buttons for switching between banks
+
 v1.3.5
 ------
 * Added option to support/deny any custom fonts used

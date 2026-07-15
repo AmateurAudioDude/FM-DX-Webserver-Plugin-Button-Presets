@@ -1,5 +1,5 @@
 /*
-    Preset Buttons v1.3.5 by AAD
+    Preset Buttons v1.3.6 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets
 */
 
@@ -60,7 +60,7 @@ const defaultPresetData = {
 
 */
 
-const pluginVersion = '1.3.5';
+const pluginVersion = '1.3.6';
 const pluginName = "Preset Buttons";
 const pluginHomepageUrl = "https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets";
 const pluginUpdateUrl = "https://raw.githubusercontent.com/AmateurAudioDude/FM-DX-Webserver-Plugin-Button-Presets/refs/heads/main/ButtonPresets/pluginButtonPresets.js";
@@ -246,12 +246,17 @@ styleButtonPresets.innerHTML = `
 }
 #import-button-preset,
 #export-button-preset {
-  opacity: .48;
+  opacity: 0;
+  z-index: 2;
   transition: opacity 0.8s !important;
+}
+#plugin-button-presets:hover #import-button-preset,
+#plugin-button-presets:hover #export-button-preset {
+  opacity: .48;
 }
 #import-button-preset:hover,
 #export-button-preset:hover {
-  opacity: .96;
+  opacity: .96 !important;
   transition: opacity 0.8s !important;
 }
 
@@ -260,10 +265,11 @@ styleButtonPresets.innerHTML = `
 }
 
 /* Move import/export if not enough width */
-@media only screen and (max-width: 1300px) {
+@media only screen and (max-width: 1359px) {
   #export-button-preset,
   #import-button-preset {
    left: -8px;
+   right: auto;
   }
 }
 
@@ -1111,6 +1117,7 @@ function updateButtons() {
     } // i
   } // iAll
   createImportExportButtons();
+  createBankNavigationArrows();
 
   // Highlight if lastUsedPreset and correct bank
   if (!lastUsedPreset || (lastUsedPreset && lastUsedPreset.bank === currentBank)) {
@@ -2090,7 +2097,7 @@ function createImportExportButtons() {
   exportButton.style.cursor = 'pointer';
   exportButton.style.position = 'absolute';
   exportButton.style.transform = 'scale(0.8)';
-  exportButton.style.right = window.innerHeight > 720 ? '-10px' : '-10px'; // Previousy -10px, -2px
+  exportButton.style.right = window.innerHeight > 720 ? '-40px' : '-40px'; // Previousy -10px, -2px
   exportButton.style.bottom = '26px';
   if (!/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     exportButton.style.marginRight = '0';
@@ -2110,7 +2117,7 @@ function createImportExportButtons() {
   importButton.style.cursor = 'pointer';
   importButton.style.position = 'absolute';
   importButton.style.transform = 'scale(0.8)';
-  importButton.style.right = window.innerHeight > 720 ? '-10px' : '-10px'; // Previousy -10px, -2px
+  importButton.style.right = window.innerHeight > 720 ? '-40px' : '-40px'; // Previousy -10px, -2px
   importButton.style.bottom = '10px';
   if (!/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     importButton.style.marginRight = '0';
@@ -2120,34 +2127,118 @@ function createImportExportButtons() {
   importButton.addEventListener('click', createFileInputAndImport);
   exportButton.addEventListener('click', exportLocalStorageToFile);
 
+  if (/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    importButton.style.opacity = '1';
+    exportButton.style.opacity = '1';
+  }
+
   // Add the buttons to the #plugin-button-presets element
   const pluginButtonPresets = document.querySelector('#plugin-button-presets');
   if (pluginButtonPresets !== null) {
     pluginButtonPresets.appendChild(importButton);
     pluginButtonPresets.appendChild(exportButton);
-
-
-    // Add hover effect for the #plugin-button-presets
-    pluginButtonPresets.addEventListener('mouseover', () => {
-      importButton.style.display = 'inline-block';
-      exportButton.style.display = 'inline-block';
-    });
-
-    if (!/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-      pluginButtonPresets.addEventListener('mouseout', () => {
-        importButton.style.display = 'none';
-        exportButton.style.display = 'none';
-      });
-
-      // Initially hide the buttons
-      importButton.style.display = 'none';
-      exportButton.style.display = 'none';
-    }
   }
 }
 
 // Call function to create and append import/export buttons
 createImportExportButtons();
+
+let styleBankNavArrows = document.createElement('style');
+styleBankNavArrows.innerHTML = `
+/* Arrows/import-export sit outside #plugin-button-presets via negative offsets, which can push page scrollWidth past the viewport */
+body {
+  overflow-x: hidden;
+}
+.bank-nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: var(--color-2-transparent);
+  color: var(--color-text);
+  font-size: 14px;
+  opacity: 0;
+  z-index: 0;
+  transition: opacity 0.3s;
+}
+.bank-nav-prev { left: -26px; }
+.bank-nav-next { right: -26px; }
+#plugin-button-presets:hover .bank-nav-arrow {
+  opacity: 1;
+}
+@media only screen and (max-width: 1359px) {
+  .bank-nav-arrow {
+    top: 100%;
+    transform: none;
+    width: 40px;
+    height: 22px;
+  }
+  @media only screen and (min-width: 819px) and (max-width: 959px) {
+    .bank-nav-arrow {
+      height: 30px;
+    }
+  }
+  @media only screen and (orientation: portrait) {
+    .bank-nav-arrow {
+      height: 28px;
+    }
+  }
+  .bank-nav-prev {
+    left: 0;
+    margin-top: 6px;
+  }
+  .bank-nav-next {
+    right: 0;
+    margin-top: 6px;
+  }
+  @media (hover: none) and (pointer: coarse) {
+    .bank-nav-prev {
+      left: 20px;
+    }
+    .bank-nav-next {
+      right: 20px;
+    }
+  }
+}
+`;
+document.head.appendChild(styleBankNavArrows);
+
+function createBankNavigationArrows() {
+  if (bankDisplayAll || bankNames.length <= 1) return;
+
+  const container = document.querySelector('#plugin-button-presets');
+  if (!container) return;
+
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const currentIndex = bankNames.indexOf(currentBank);
+
+  function goToBank(targetBank) {
+    currentBank = targetBank;
+    dropdownInput.value = `${bankName} ${currentBank}`;
+    updateButtons();
+    setTimeout(highlightActivePreset, 100);
+  }
+
+  function makeArrow(side, targetBank) {
+    const arrow = document.createElement('button');
+    arrow.id = `bank-nav-${side}`;
+    arrow.classList.add('tooltip-presets', 'bank-nav-arrow', `bank-nav-${side}`);
+    arrow.setAttribute('data-tooltip', `${bankName} ${targetBank}`);
+    arrow.innerHTML = `<i class="fa-solid fa-chevron-${side === 'prev' ? 'left' : 'right'}"></i>`;
+    if (isMobile) arrow.style.opacity = '1';
+    arrow.addEventListener('click', () => goToBank(targetBank));
+    container.appendChild(arrow);
+  }
+
+  if (currentIndex > 0) makeArrow('prev', bankNames[currentIndex - 1]);
+  if (currentIndex < bankNames.length - 1) makeArrow('next', bankNames[currentIndex + 1]);
+}
+
+createBankNavigationArrows();
 
 // Code if a custom font is used
 document.addEventListener("DOMContentLoaded", function () {
