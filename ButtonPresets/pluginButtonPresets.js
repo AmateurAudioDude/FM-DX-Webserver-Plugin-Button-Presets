@@ -84,10 +84,14 @@ let defaultButtonPresetImagePath = ' data:image/webp;base64,UklGRpQEAABXRUJQVlA4
 // Create a style element
 let styleButtonPresets = document.createElement('style');
 styleButtonPresets.innerHTML = `
-/* Frosted glass effect */
-#plugin-button-presets button,
+/* Frosted glass effect (disabled in Show All Presets) */
+#plugin-button-presets:not(.show-all-presets) button,
 .tooltip-presets::after {
   backdrop-filter: blur(5px);
+}
+
+#plugin-button-presets button,
+.tooltip-presets::after {
   transition: 0.6s ease background-color;
 }
 
@@ -669,6 +673,7 @@ function updateButtonsDelayed() {
 // Update buttons based on the selected bank
 function updateButtons() {
   buttonContainer.innerHTML = ''; // Clear existing buttons
+  buttonContainer.classList.toggle('show-all-presets', bankDisplayAll);
   // 30+ button display
   let buttonRows = 1;
 
@@ -831,34 +836,30 @@ function updateButtons() {
         }
         
         // Handle keyboard events for SHIFT + S and SHIFT + R
-        document.addEventListener('keydown', function(e) {
-          let isButtonFocused = document.activeElement === button;
+        button.addEventListener('keydown', function(e) {
+          if (e.shiftKey && e.key === 'S') {
+            // SHIFT + S key combination
+            let dataFrequencyElement = document.getElementById('data-frequency');
+            let dataPsElement = document.getElementById('data-ps');
+            let dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
+            let dataPs = dataPsElement ? dataPsElement.textContent : '';
 
-          if (isButtonFocused) {
-            if (e.shiftKey && e.key === 'S') {
-              // SHIFT + S key combination
-              let dataFrequencyElement = document.getElementById('data-frequency');
-              let dataPsElement = document.getElementById('data-ps');
-              let dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
-              let dataPs = dataPsElement ? dataPsElement.textContent : '';
-              
-              buttonValues[index] = parseFloat(dataFrequency) || 87.5;
-              antennaValues[index] = getCurrentAntennaValue();
-              psValues[index] = dataPs;
-              buttonImages[index] = getImageSrc();
-              tooltipValues[index] = getTooltipValue() || ''; // Ensures tooltipValue is not null
-              updateButton(button, buttonValues[index], index);
-              checkBankASum();
-            } else if (e.shiftKey && e.key === 'R') {
-              // SHIFT + R key combination
-              buttonValues[index] = 87.5;
-              antennaValues[index] = '';
-              psValues[index] = '';
-              buttonImages[index] = '';
-              tooltipValues[index] = ''; // Reset the tooltip value as well
-              updateButton(button, buttonValues[index], index);
-              checkBankASum();
-            }
+            buttonValues[index] = parseFloat(dataFrequency) || 87.5;
+            antennaValues[index] = getCurrentAntennaValue();
+            psValues[index] = dataPs;
+            buttonImages[index] = getImageSrc();
+            tooltipValues[index] = getTooltipValue() || ''; // Ensures tooltipValue is not null
+            updateButton(button, buttonValues[index], index);
+            checkBankASum();
+          } else if (e.shiftKey && e.key === 'R') {
+            // SHIFT + R key combination
+            buttonValues[index] = 87.5;
+            antennaValues[index] = '';
+            psValues[index] = '';
+            buttonImages[index] = '';
+            tooltipValues[index] = ''; // Reset the tooltip value as well
+            updateButton(button, buttonValues[index], index);
+            checkBankASum();
           }
         });
 
